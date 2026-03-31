@@ -4,163 +4,577 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="color-scheme" content="dark">
-<title>Zenith Travel Hub · 全网出行决策套利中心</title>
+<title>Zenith Travel Hub · 全网出行决策工作站</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-/* 样式保留你最喜欢的黑金玻璃拟态风格 */
 :root {
-  --bg: #020617; --surface: rgba(255,255,255,0.05); --border: rgba(255,255,255,0.09);
-  --amber: #F59E0B; --green: #10B981; --blue: #3B82F6; --red: #EF4444;
-  --text: #F1F5F9; --muted: rgba(241,245,249,0.45); --font: 'Sora', sans-serif;
+  --bg: #020617;
+  --border: rgba(255,255,255,0.09);
+  --amber: #F59E0B;
+  --green: #10B981;
+  --blue: #3B82F6;
+  --red: #EF4444;
+  --text: #F1F5F9;
+  --muted: rgba(241,245,249,0.45);
+  --font: 'Sora', -apple-system, sans-serif;
+  --mono: 'JetBrains Mono', 'Courier New', monospace;
 }
 *,*::before,*::after{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
-body{background-color:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased}
-#bg-mesh{position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse 70% 55% at 15% 8%,rgba(245,158,11,0.09) 0%,transparent 60%);background-color:#020617}
-.glass{background:rgba(255,255,255,0.05);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.09);border-radius:18px}
-.label{font-family:'JetBrains Mono';font-size:.64rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
-.price-big{font-family:'JetBrains Mono';font-size:1.85rem;font-weight:700}
-.tag{display:inline-flex;padding:4px 11px;border-radius:99px;font-size:.7rem;font-weight:600;border:1px solid transparent}
+html{background-color:#020617 !important;-webkit-text-size-adjust:100%}
+body{background-color:#020617 !important;color:#F1F5F9;font-family:'Sora',-apple-system,sans-serif;min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+#bg-mesh{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse 70% 55% at 15% 8%,rgba(245,158,11,0.09) 0%,transparent 60%),radial-gradient(ellipse 55% 45% at 82% 82%,rgba(59,130,246,0.07) 0%,transparent 55%),radial-gradient(ellipse 45% 40% at 58% 32%,rgba(16,185,129,0.06) 0%,transparent 50%);background-color:#020617}
+#bg-grid{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,0.018) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.018) 1px,transparent 1px);background-size:42px 42px}
+#scan-overlay{position:fixed;inset:0;z-index:999;background:#020617;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;transition:opacity .6s ease}
+#scan-overlay.fade-out{opacity:0;pointer-events:none}
+.scan-logo{width:88px;height:88px;border-radius:50%;border:2px solid var(--amber);box-shadow:0 0 0 6px rgba(245,158,11,.1),0 0 40px rgba(245,158,11,.35);overflow:hidden;animation:pulse-ring 2s ease-in-out infinite;background:#0d1526;display:flex;align-items:center;justify-content:center}
+.scan-logo img{width:100%;height:100%;object-fit:cover;display:block}
+.scan-title{font-size:1.2rem;font-weight:800;letter-spacing:.1em;color:var(--amber)}
+.scan-bar-wrap{width:240px;height:3px;background:rgba(255,255,255,.1);border-radius:99px;overflow:hidden}
+.scan-bar{height:100%;width:0%;background:var(--amber);border-radius:99px;animation:scan-fill 2.3s cubic-bezier(.4,0,.2,1) forwards}
+.scan-status{font-family:var(--mono);font-size:.7rem;color:var(--muted);animation:blink .7s steps(1) infinite}
+@keyframes scan-fill{0%{width:0%}100%{width:100%}}
+@keyframes pulse-ring{0%,100%{box-shadow:0 0 0 6px rgba(245,158,11,.1),0 0 40px rgba(245,158,11,.3)}50%{box-shadow:0 0 0 10px rgba(245,158,11,.15),0 0 60px rgba(245,158,11,.6)}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+.glass{background:rgba(255,255,255,0.05);-webkit-backdrop-filter:blur(20px) saturate(1.3);backdrop-filter:blur(20px) saturate(1.3);border:1px solid rgba(255,255,255,0.09);border-radius:18px}
+.ga{border-color:rgba(245,158,11,.35) !important}
+.gg{border-color:rgba(16,185,129,.3) !important}
+.label{font-family:var(--mono);font-size:.64rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.price-big{font-family:var(--mono);font-size:1.85rem;font-weight:700;line-height:1}
+.tag{display:inline-flex;align-items:center;gap:4px;padding:4px 11px;border-radius:99px;font-size:.7rem;font-weight:600;border:1px solid transparent;white-space:nowrap}
 .ta{background:rgba(245,158,11,.13);color:var(--amber);border-color:rgba(245,158,11,.25)}
 .tg{background:rgba(16,185,129,.13);color:var(--green);border-color:rgba(16,185,129,.25)}
-.tn{background:rgba(255,255,255,.05);color:var(--muted)}
-.btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:12px;border-radius:12px;border:none;cursor:pointer;font-weight:600;transition:all .2s}
+.tb{background:rgba(59,130,246,.13);color:var(--blue);border-color:rgba(59,130,246,.25)}
+.tn{background:rgba(255,255,255,.05);color:var(--muted);border-color:rgba(255,255,255,.09)}
+.toggle-wrap{display:inline-flex;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);border-radius:99px;padding:3px}
+.tog-btn{padding:8px 20px;border-radius:99px;border:none;font-family:var(--font);font-size:.8rem;font-weight:600;cursor:pointer;transition:all .22s;background:transparent;color:var(--muted)}
+.tog-btn.active{background:var(--amber);color:#020617;box-shadow:0 0 18px rgba(245,158,11,.4)}
+.inp-wrap{position:relative}
+.inp-wrap input,.inp-wrap select{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:13px 14px 13px 42px;font-family:var(--font);font-size:.88rem;color:#F1F5F9;outline:none;transition:border-color .2s;-webkit-appearance:none;appearance:none}
+.inp-wrap input:focus{border-color:var(--amber);box-shadow:0 0 0 3px rgba(245,158,11,.12)}
+.inp-wrap input::placeholder{color:rgba(241,245,249,.3)}
+.inp-ico{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:1rem;pointer-events:none;line-height:1}
+.auto-drop{position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:60;background:#0d1a2e;border:1px solid rgba(255,255,255,.1);border-radius:12px;overflow:hidden;box-shadow:0 24px 50px rgba(0,0,0,.6);animation:drop-in .16s ease}
+.auto-item{padding:12px 14px;display:flex;align-items:center;gap:10px;font-size:.84rem;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.05);color:#F1F5F9}
+.auto-item:last-child{border-bottom:none}
+.auto-item:active{background:rgba(245,158,11,.09)}
+.auto-sub{font-size:.7rem;color:var(--muted);margin-top:2px}
+@keyframes drop-in{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
+.btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:12px 16px;border-radius:12px;border:none;cursor:pointer;font-family:var(--font);font-size:.84rem;font-weight:600;transition:all .2s;-webkit-appearance:none}
+.btn:active{transform:scale(.97)}
 .btn-amber{background:var(--amber);color:#020617;box-shadow:0 4px 20px rgba(245,158,11,.32)}
 .btn-ghost{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);color:#F1F5F9}
-.toggle-wrap{display:inline-flex;background:rgba(255,255,255,.06);border-radius:99px;padding:3px}
-.tog-btn{padding:8px 20px;border-radius:99px;border:none;font-size:.8rem;cursor:pointer;background:transparent;color:var(--muted)}
-.tog-btn.active{background:var(--amber);color:#020617}
-.inp-wrap{position:relative;margin-bottom:12px}
-.inp-wrap input{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:13px 40px;color:#fff;outline:none}
-.inp-ico{position:absolute;left:14px;top:50%;transform:translateY(-50%)}
-#searchBtn{width:100%;padding:15px;border-radius:14px;background:var(--amber);color:#020617;font-weight:700;border:none;box-shadow:0 8px 30px rgba(245,158,11,.3);cursor:pointer}
+#searchBtn{width:100%;padding:15px;border-radius:14px;border:none;background:linear-gradient(135deg,#F59E0B,#D97706);color:#020617;font-family:var(--font);font-size:.96rem;font-weight:700;cursor:pointer;box-shadow:0 8px 30px rgba(245,158,11,.36);transition:all .22s;display:flex;align-items:center;justify-content:center;gap:8px;-webkit-appearance:none}
+#searchBtn:active{transform:scale(.98)}
+.p-card{animation:card-in .38s cubic-bezier(.34,1.5,.64,1) both}
+.p-card:nth-child(2){animation-delay:.07s}.p-card:nth-child(3){animation-delay:.14s}.p-card:nth-child(4){animation-delay:.21s}.p-card:nth-child(5){animation-delay:.28s}
+@keyframes card-in{from{opacity:0;transform:translateY(20px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
+.arb-badge{background:linear-gradient(135deg,#F59E0B,#EF4444);color:#fff;font-size:.66rem;font-weight:700;padding:4px 10px;border-radius:99px;animation:arb-pulse 1.4s ease-in-out infinite}
+@keyframes arb-pulse{0%,100%{box-shadow:0 4px 16px rgba(245,158,11,.45)}50%{box-shadow:0 4px 28px rgba(245,158,11,.85)}}
+.ai-bubble{background:linear-gradient(135deg,rgba(245,158,11,.07),rgba(59,130,246,.05));border:1px solid rgba(245,158,11,.18);border-radius:14px;padding:13px;font-size:.85rem;line-height:1.68;color:#F1F5F9}
+.ai-ava{width:36px;height:36px;border-radius:50%;border:2px solid var(--amber);overflow:hidden;flex-shrink:0;background:#0d1526;display:flex;align-items:center;justify-content:center}
+.ai-ava img{width:100%;height:100%;object-fit:cover;display:block}
+.dots{display:flex;gap:5px;align-items:center;padding:5px 2px}
+.dots span{width:6px;height:6px;border-radius:50%;background:var(--amber);opacity:.4;animation:dot-b 1.2s ease-in-out infinite}
+.dots span:nth-child(2){animation-delay:.2s}.dots span:nth-child(3){animation-delay:.4s}
+@keyframes dot-b{0%,80%,100%{transform:scale(.7);opacity:.4}40%{transform:scale(1.1);opacity:1}}
+.stat-a{font-family:var(--mono);font-size:1.5rem;font-weight:700;background:linear-gradient(135deg,#F59E0B,#FBBF24);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.stat-g{font-family:var(--mono);font-size:1.5rem;font-weight:700;background:linear-gradient(135deg,#10B981,#34D399);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.meter{height:5px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden}
+.meter-fill{height:100%;border-radius:99px;transition:width .8s cubic-bezier(.34,1.2,.64,1)}
+#settingsDrawer{position:fixed;inset:0;z-index:200;display:none;align-items:flex-end}
+#settingsDrawer.open{display:flex}
+#settingsBg{position:absolute;inset:0;background:rgba(0,0,0,.65);-webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px)}
+#settingsPanel{position:relative;z-index:1;width:100%;max-height:90vh;overflow-y:auto;background:#0c1829;border-top-left-radius:22px;border-top-right-radius:22px;border:1px solid rgba(255,255,255,.1);padding:18px 16px 40px;animation:slide-up .3s cubic-bezier(.34,1.2,.64,1)}
+@keyframes slide-up{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.s-handle{width:40px;height:4px;border-radius:99px;background:rgba(255,255,255,.15);margin:0 auto 18px}
+.s-inp{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:12px 14px;font-family:var(--mono);font-size:.78rem;color:#F1F5F9;outline:none;-webkit-appearance:none;appearance:none}
+.s-inp:focus{border-color:var(--amber)}
+.s-inp::placeholder{color:rgba(241,245,249,.2)}
+.s-inp option{background:#0c1829;color:#F1F5F9}
+.sec{font-size:.66rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:8px}
+.sec::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.09)}
+.hr{height:1px;background:rgba(255,255,255,.09);margin:12px 0}
+#dis-body{display:none;font-size:.78rem;color:var(--muted);line-height:1.72;padding-top:12px}
+#dis-body.open{display:block}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-thumb{background:rgba(245,158,11,.22);border-radius:99px}
+/* AI 引擎状态指示 */
+.ai-engine-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.3);border-radius:99px;padding:3px 10px;font-size:.68rem;font-weight:600;color:var(--green)}
 </style>
 </head>
 <body>
 
 <div id="bg-mesh"></div>
+<div id="bg-grid"></div>
 
-<div id="app" style="max-width:480px;margin:0 auto;padding:20px 14px;position:relative;z-index:1;">
-  <header style="display:flex;justify-content:space-between;margin-bottom:20px;">
-    <div>
-      <div style="font-weight:800;font-size:1.1rem;color:var(--amber);">ZENITH TRAVEL</div>
-      <div class="label" style="color:var(--green);">● 系统分销已激活</div>
-    </div>
-    <div class="glass" style="padding:5px 12px; display:flex; flex-direction:column; align-items:flex-end;">
-      <div class="label">累计套利</div>
-      <div id="totalSaved" style="color:var(--amber); font-weight:700;">¥0.00</div>
-    </div>
-  </header>
-
-  <div style="display:flex;justify-content:center;margin-bottom:20px;">
-    <div class="toggle-wrap">
-      <button class="tog-btn active" id="modeP" onclick="setMode('passenger')">🧍 乘客省钱</button>
-      <button class="tog-btn" id="modeD" onclick="setMode('driver')">🚗 司机赚钱</button>
-    </div>
+<div id="scan-overlay">
+  <div class="scan-logo">
+    <img src="IMG_8445.jpeg" alt="Zenith" onerror="this.style.display='none';this.parentNode.innerHTML='<span style=\'font-size:2.2rem\'>🌟</span>'">
   </div>
+  <div class="scan-title">ZENITH TRAVEL HUB</div>
+  <div class="scan-bar-wrap"><div class="scan-bar"></div></div>
+  <div class="scan-status" id="scanStatus">正在扫描全网运力数据…</div>
+</div>
 
-  <div class="glass" id="searchSection" style="padding:20px;margin-bottom:20px;">
-    <div class="inp-wrap"><span class="inp-ico">🟢</span><input type="text" id="fromInput" placeholder="输入起点"></div>
-    <div class="inp-wrap"><span class="inp-ico">🔴</span><input type="text" id="toInput" placeholder="输入终点"></div>
-    <div style="display:flex;gap:10px;margin-bottom:15px;">
-      <div class="inp-wrap" style="flex:1;margin:0;"><span class="inp-ico">🛣️</span><input type="number" id="kmInput" placeholder="公里"></div>
-      <div class="inp-wrap" style="flex:1;margin:0;"><span class="inp-ico">⏱️</span><input type="number" id="minInput" placeholder="分钟"></div>
+<div id="settingsDrawer">
+  <div id="settingsBg" onclick="closeSettings()"></div>
+  <div id="settingsPanel">
+    <div class="s-handle"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+      <div style="font-weight:700;font-size:1rem;color:#F1F5F9;">⚙️ AI 引擎配置</div>
+      <button onclick="closeSettings()" style="background:none;border:none;color:var(--muted);font-size:1.4rem;cursor:pointer;padding:0 4px;">×</button>
     </div>
-    <button id="searchBtn" onclick="runSearch()">🔍 全网比价 · 实时获利</button>
-  </div>
-
-  <div id="passResults" style="display:none;">
-    <div class="label" style="margin-bottom:10px;">🏆 最优获利方案</div>
-    <div id="platformCards" style="display:flex;flex-direction:column;gap:12px;"></div>
-  </div>
-
-  <div id="driverPanel" style="display:none;">
-    <div class="glass" style="padding:20px;">
-        <div class="label" style="margin-bottom:15px;">🧮 司机净利计算器</div>
-        <div class="inp-wrap"><span class="inp-ico">💴</span><input type="number" id="dAmt" placeholder="订单总额"></div>
-        <button class="btn btn-amber" onclick="calcDriver()">开始精算收益</button>
-        <div id="driverResult" style="margin-top:20px; display:none;"></div>
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <div>
+        <div class="label" style="margin-bottom:6px;">🤖 通义千问 API Key（已内置）</div>
+        <input class="s-inp" id="keyQwen" placeholder="sk-..." type="password">
+        <div style="font-size:.7rem;color:var(--green);margin-top:5px;">● 默认使用通义千问 Qwen-Plus</div>
+      </div>
+      <div><div class="label" style="margin-bottom:6px;">🧠 OpenAI GPT-4（可选）</div><input class="s-inp" id="keyOpenAI" placeholder="sk-..." type="password"></div>
+      <div><div class="label" style="margin-bottom:6px;">⚡ Anthropic Claude（可选）</div><input class="s-inp" id="keyClaude" placeholder="sk-ant-..." type="password"></div>
+      <div><div class="label" style="margin-bottom:6px;">🐋 DeepSeek（可选）</div><input class="s-inp" id="keyDS" placeholder="sk-..." type="password"></div>
+      <div>
+        <div class="label" style="margin-bottom:6px;">选择 AI 引擎</div>
+        <select class="s-inp" id="aiEngine">
+          <option value="qwen" selected>🤖 通义千问 Qwen-Plus（推荐）</option>
+          <option value="openai">🧠 OpenAI GPT-4</option>
+          <option value="claude">⚡ Anthropic Claude</option>
+          <option value="deepseek">🐋 DeepSeek</option>
+          <option value="demo">📺 演示模式</option>
+        </select>
+      </div>
     </div>
+    <div style="display:flex;gap:10px;margin-top:20px;">
+      <button class="btn btn-amber" onclick="saveSettings()" style="flex:1;">💾 保存</button>
+      <button class="btn btn-ghost" onclick="clearKeys()" style="flex:0.5;font-size:.75rem;">🗑 清除</button>
+    </div>
+    <p style="margin-top:12px;font-size:.7rem;color:var(--muted);text-align:center;">🔒 密钥仅存储于本地 LocalStorage</p>
   </div>
 </div>
 
-<script>
-// --- 老板！这里是你的专属收银台配置 ---
-const AMAP_KEY = ''; // 预留高德Key
-const MY_LINKS = {
-    didi_cx: "https://vv.didi.cn/jnd2xvz?source_id=458986jutuike123456&ref_from=dunion", // 滴滴打车
-    hxz_new: "https://x.huaxz.cn/R2WQ955?source_id=458986jutuike123456&ref_from=dunion", // 花小猪新客
-    hxz_driver: "https://v.didi.cn/nDzqX73?source_id=458986jutuike123456&ref_from=dunion" // 花小猪司机
-};
+<div id="app" style="max-width:480px;margin:0 auto;padding:0 14px 80px;position:relative;z-index:1;">
 
+  <header style="display:flex;align-items:center;justify-content:space-between;padding:18px 0 14px;">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div style="width:40px;height:40px;border-radius:50%;border:2px solid var(--amber);overflow:hidden;box-shadow:0 0 16px rgba(245,158,11,.35);background:#0d1526;flex-shrink:0;">
+        <img src="IMG_8445.jpeg" alt="Z" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="this.style.display='none';this.parentNode.innerHTML='🌟'">
+      </div>
+      <div>
+        <div style="font-weight:800;font-size:.9rem;letter-spacing:.05em;color:#F1F5F9;">ZENITH TRAVEL</div>
+        <div style="display:flex;align-items:center;gap:6px;margin-top:2px;">
+          <div class="label" style="color:#10B981;">● LIVE</div>
+          <div class="ai-engine-badge" id="engineBadge">🤖 千问 AI</div>
+        </div>
+      </div>
+    </div>
+    <button onclick="openSettings()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:9px 13px;color:var(--muted);cursor:pointer;font-size:.9rem;-webkit-appearance:none;">⚙️</button>
+  </header>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
+    <div class="glass" style="padding:14px 14px 12px;">
+      <div class="label" style="margin-bottom:7px;">💰 累计已省</div>
+      <div class="stat-a" id="totalSaved">¥0.00</div>
+      <div style="font-size:.7rem;color:var(--muted);margin-top:3px;">全网套利累积</div>
+    </div>
+    <div class="glass" style="padding:14px 14px 12px;">
+      <div class="label" style="margin-bottom:7px;">📊 比价次数</div>
+      <div class="stat-g" id="queryCount">0</div>
+      <div style="font-size:.7rem;color:var(--muted);margin-top:3px;">本会话累计</div>
+    </div>
+  </div>
+
+  <div style="display:flex;justify-content:center;margin-bottom:18px;">
+    <div class="toggle-wrap">
+      <button class="tog-btn active" id="modeP" onclick="setMode('passenger')">🧍 乘客</button>
+      <button class="tog-btn" id="modeD" onclick="setMode('driver')">🚗 司机端</button>
+    </div>
+  </div>
+
+  <div class="glass" style="padding:16px;margin-bottom:16px;" id="searchSection">
+    <div class="sec" style="margin-bottom:14px;">🗺️ 行程规划</div>
+    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
+      <button class="tag ta" id="weatherTag" onclick="cycleWeather()" style="cursor:pointer;"><span id="weatherIco">☀️</span><span id="weatherLbl">晴天</span></button>
+      <button class="tag ta" id="timeTag" onclick="cycleTime()" style="cursor:pointer;"><span>🕐</span><span id="timeLbl">平峰</span></button>
+    </div>
+    <div class="inp-wrap" style="margin-bottom:8px;">
+      <span class="inp-ico">🟢</span>
+      <input type="text" id="fromInput" placeholder="起点：出发地址" oninput="showAuto('from')" onfocus="showAuto('from')" onblur="hideAuto('from',320)">
+      <div class="auto-drop" id="fromAuto" style="display:none;"></div>
+    </div>
+    <div style="text-align:center;margin:0 0 8px;position:relative;z-index:2;">
+      <button onclick="swapLoc()" style="background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.3);border-radius:8px;padding:5px 16px;color:var(--amber);font-size:.85rem;cursor:pointer;-webkit-appearance:none;">⇅</button>
+    </div>
+    <div class="inp-wrap" style="margin-bottom:14px;">
+      <span class="inp-ico">🔴</span>
+      <input type="text" id="toInput" placeholder="终点：目的地" oninput="showAuto('to')" onfocus="showAuto('to')" onblur="hideAuto('to',320)">
+      <div class="auto-drop" id="toAuto" style="display:none;"></div>
+    </div>
+    <div class="label" style="margin-bottom:8px;">📏 快速选距</div>
+    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
+      <button class="tag ta" onclick="setKm(3)" style="cursor:pointer;">3 km</button>
+      <button class="tag tb" onclick="setKm(8)" style="cursor:pointer;">8 km</button>
+      <button class="tag tg" onclick="setKm(15)" style="cursor:pointer;">15 km</button>
+      <button class="tag ta" onclick="setKm(25)" style="cursor:pointer;">25 km</button>
+      <button class="tag tn" onclick="setCustomKm()" style="cursor:pointer;">自定义</button>
+    </div>
+    <div style="display:flex;gap:10px;margin-bottom:16px;">
+      <div class="inp-wrap" style="flex:1;"><span class="inp-ico">🛣️</span><input type="number" id="kmInput" placeholder="距离 km" min="0.5" max="200" step="0.5"></div>
+      <div class="inp-wrap" style="flex:1;"><span class="inp-ico">⏱️</span><input type="number" id="minInput" placeholder="预计分钟" min="1" max="300"></div>
+    </div>
+    <button id="searchBtn" onclick="runSearch()"><span>🔍</span><span id="searchBtnTxt">全网比价 · 精算套利</span></button>
+  </div>
+
+  <div id="passResults" style="display:none;">
+    <div class="glass ga" style="padding:14px 16px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <div class="label" style="margin-bottom:4px;">⚡ 套利差价空间</div>
+        <div style="font-family:var(--mono);font-size:1.5rem;font-weight:700;color:var(--amber);" id="arbAmt">—</div>
+      </div>
+      <div id="arbTagWrap"></div>
+    </div>
+    <div class="sec" style="margin-bottom:12px;">🏆 平台比价结果</div>
+    <div id="platformCards" style="display:flex;flex-direction:column;gap:12px;"></div>
+    <div style="margin-top:18px;">
+      <div class="sec" style="margin-bottom:12px;">🤖 千问 AI 精算师</div>
+      <div class="glass" style="padding:14px;">
+        <div style="display:flex;align-items:flex-start;gap:10px;">
+          <div class="ai-ava"><img src="IMG_8445.jpeg" alt="AI" onerror="this.style.display='none';this.parentNode.innerHTML='🤖'"></div>
+          <div style="flex:1;">
+            <div style="font-size:.76rem;font-weight:700;color:var(--amber);margin-bottom:6px;">Zenith 首席精算师 · Sunny <span style="color:var(--green);font-weight:400;">· 千问驱动</span></div>
+            <div class="ai-bubble" id="aiOutput"><div class="dots"><span></span><span></span><span></span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="driverPanel" style="display:none;">
+    <div class="glass" style="padding:16px;margin-bottom:14px;">
+      <div class="sec" style="margin-bottom:14px;">🧮 净利精算面板</div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div class="inp-wrap"><span class="inp-ico">💴</span><input type="number" id="dAmt" placeholder="订单金额 ¥" min="1" step="0.1"></div>
+        <div style="display:flex;gap:10px;">
+          <div class="inp-wrap" style="flex:1;"><span class="inp-ico">🛣️</span><input type="number" id="dKm" placeholder="里程 km" min="0.5" step="0.5"></div>
+          <div class="inp-wrap" style="flex:1;"><span class="inp-ico">⏱️</span><input type="number" id="dMin" placeholder="分钟" min="1"></div>
+        </div>
+        <div>
+          <div class="label" style="margin-bottom:7px;">📊 平台抽成</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="tag ta" id="c23" onclick="setComm(0.23,this)" style="cursor:pointer;">滴滴 23%</button>
+            <button class="tag tn" id="c20" onclick="setComm(0.20,this)" style="cursor:pointer;">高德 20%</button>
+            <button class="tag tn" id="c18" onclick="setComm(0.18,this)" style="cursor:pointer;">哈啰 18%</button>
+            <button class="tag tn" id="c15" onclick="setComm(0.15,this)" style="cursor:pointer;">嘀嗒 15%</button>
+          </div>
+        </div>
+        <div>
+          <div class="label" style="margin-bottom:7px;">⚡ 能源类型</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="tag tn" id="eEV" onclick="setEnergy(0.38,this)" style="cursor:pointer;">⚡ 纯电 ¥0.38</button>
+            <button class="tag ta" id="eGas" onclick="setEnergy(0.65,this)" style="cursor:pointer;">⛽ 燃油 ¥0.65</button>
+            <button class="tag tn" id="eHyb" onclick="setEnergy(0.48,this)" style="cursor:pointer;">🔋 混动 ¥0.48</button>
+          </div>
+        </div>
+        <button class="btn btn-amber" onclick="calcDriver()">🧮 开始精算</button>
+      </div>
+    </div>
+    <div class="glass" id="driverResult" style="padding:16px;display:none;">
+      <div class="sec" style="margin-bottom:14px;">📋 精算报告</div>
+      <div id="driverResultContent"></div>
+    </div>
+  </div>
+
+  <div class="glass" style="padding:14px;margin-top:20px;">
+    <button onclick="toggleDis()" style="background:none;border:none;color:var(--muted);font-size:.78rem;cursor:pointer;width:100%;text-align:left;display:flex;justify-content:space-between;align-items:center;-webkit-appearance:none;">
+      <span>ℹ️ 免责声明与定价算法说明</span><span id="dis-arrow">▼</span>
+    </button>
+    <div id="dis-body">
+      <div class="hr"></div>
+      <p style="margin-bottom:10px;color:var(--muted);"><strong style="color:var(--amber);">价格预估算法：</strong><br>网约车：起步¥14.0 + ¥2.3/km + ¥0.5/min，叠加天气×时段×随机±12%波动。顺风车：起步¥10.0 + ¥1.2/km，固定一口价。所有价格仅为估算参考。</p>
+      <p style="margin-bottom:10px;color:var(--muted);"><strong style="color:var(--amber);">免责声明：</strong><br>本应用价格均为算法模拟估算，实际费用以各平台官方应用为准。平台链接含推广参数，点击跳转即视为同意。</p>
+      <p style="color:rgba(255,255,255,.2);font-size:.68rem;">Zenith Travel Hub v3.0 · 千问AI驱动 · Powered by Zenith Tech</p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ═══ 配置区 ═══
+const DEFAULT_QWEN_KEY = 'sk-cfb5319ee5a24f7b9361608b7615a79b';
+const QWEN_API = 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions';
+
+// ═══ 平台数据（含真实推广链接）═══
 const PLATFORMS = [
-  {id:'didi', n:'滴滴快车', ico:'🚖', type:'ridehail', col:'#F59E0B', link: MY_LINKS.didi_cx, coupon:'领¥5券下单'},
-  {id:'hxz', n:'花小猪', ico:'🐷', type:'ridehail', col:'#EC4899', link: MY_LINKS.hxz_new, coupon:'新客立减¥8'},
-  {id:'hello', n:'哈啰顺风车', ico:'💨', type:'hitch', col:'#10B981', link: MY_LINKS.didi_cx, coupon:'特价一口价'},
-  {id:'dida', n:'嘀嗒顺风车', ico:'👍', type:'hitch', col:'#A78BFA', link: MY_LINKS.didi_cx, coupon:'极速接单'}
+  {
+    id:'didi', n:'滴滴快车', ico:'🚖', type:'ridehail', col:'#F59E0B',
+    coupon:'领¥5优惠券',
+    url:'https://v.didi.cn/3Zajzk5?source_id=458986jutuike123456&ref_from=dunion'
+  },
+  {
+    id:'didi2', n:'滴滴打车', ico:'🚕', type:'ridehail', col:'#FBBF24',
+    coupon:'新客专享券',
+    url:'https://vv.didi.cn/jnd2xvz?source_id=458986jutuike123456&ref_from=dunion'
+  },
+  {
+    id:'hua', n:'花小猪（新客）', ico:'🐷', type:'ridehail', col:'#EC4899',
+    coupon:'新客立减¥8',
+    url:'https://x.huaxz.cn/R2WQ955?source_id=458986jutuike123456&ref_from=dunion'
+  },
+  {
+    id:'hua_driver', n:'花小猪司机端', ico:'🚗', type:'hitch', col:'#F97316',
+    coupon:'司机注册奖励',
+    url:'https://v.didi.cn/nDzqX73?source_id=458986jutuike123456&ref_from=dunion',
+    driverOnly: true
+  },
+  {
+    id:'hello', n:'哈啰顺风车', ico:'💨', type:'hitch', col:'#10B981',
+    coupon:'领¥6优惠券',
+    url:'#hello'
+  },
 ];
 
-let totalSaved = 0;
+const S={weather:0,time:0,comm:0.23,energy:0.65,totalSaved:0,queries:0};
+const WEATHERS=[{ico:'☀️',lbl:'晴天',mult:1},{ico:'🌧️',lbl:'小雨',mult:1.18},{ico:'⛈️',lbl:'暴雨',mult:1.35}];
+const TIMES=[{lbl:'平峰',mult:1},{lbl:'早高峰',mult:1.28},{lbl:'晚高峰',mult:1.22},{lbl:'深夜',mult:.95}];
+const PLACES=[{n:'上海虹桥机场',s:'闵行区，上海'},{n:'上海浦东国际机场',s:'浦东新区，上海'},{n:'南京东路步行街',s:'黄浦区，上海'},{n:'陆家嘴金融中心',s:'浦东新区，上海'},{n:'人民广场',s:'黄浦区，上海'},{n:'徐家汇商业区',s:'徐汇区，上海'},{n:'世纪公园',s:'浦东新区，上海'},{n:'同济大学',s:'杨浦区，上海'},{n:'深圳北站',s:'龙华区，深圳'},{n:'西湖景区',s:'杭州，浙江'},{n:'广州南站',s:'番禺区，广州'},{n:'北京南站',s:'丰台区，北京'}];
 
+// ═══ 开机动画 ═══
+const MSGS=['正在扫描全网运力数据…','加载千问AI决策引擎…','连接推广平台接口…','初始化套利分析模块…','准备就绪 ✓'];
+let si=0;
+const st=setInterval(()=>{if(++si<MSGS.length)document.getElementById('scanStatus').textContent=MSGS[si];else clearInterval(st);},430);
+setTimeout(()=>{const o=document.getElementById('scan-overlay');o.classList.add('fade-out');setTimeout(()=>o.style.display='none',700);},2500);
+
+// ═══ 统计 ═══
+function loadStats(){S.totalSaved=parseFloat(localStorage.getItem('zt_saved')||'0');S.queries=parseInt(localStorage.getItem('zt_q')||'0');updStats();}
+function updStats(){document.getElementById('totalSaved').textContent='¥'+S.totalSaved.toFixed(2);document.getElementById('queryCount').textContent=S.queries;}
+function saveStats(){localStorage.setItem('zt_saved',S.totalSaved.toFixed(2));localStorage.setItem('zt_q',S.queries);}
+loadStats();
+updEngineBadge();
+
+function updEngineBadge(){
+  const e=localStorage.getItem('zt_engine')||'qwen';
+  const map={qwen:'🤖 千问 AI',openai:'🧠 GPT-4',claude:'⚡ Claude',deepseek:'🐋 DeepSeek',demo:'📺 演示'};
+  document.getElementById('engineBadge').textContent=map[e]||'🤖 千问 AI';
+}
+
+// ═══ 模式切换 ═══
 function setMode(m){
-    document.getElementById('modeP').classList.toggle('active',m==='passenger');
-    document.getElementById('modeD').classList.toggle('active',m==='driver');
-    document.getElementById('searchSection').style.display=m==='passenger'?'block':'none';
-    document.getElementById('driverPanel').style.display=m==='driver'?'block':'none';
-    document.getElementById('passResults').style.display='none';
+  document.getElementById('modeP').classList.toggle('active',m==='passenger');
+  document.getElementById('modeD').classList.toggle('active',m==='driver');
+  document.getElementById('searchSection').style.display=m==='passenger'?'block':'none';
+  document.getElementById('passResults').style.display='none';
+  document.getElementById('driverPanel').style.display=m==='driver'?'block':'none';
 }
 
+// ═══ 天气/时段 ═══
+function cycleWeather(){S.weather=(S.weather+1)%WEATHERS.length;const w=WEATHERS[S.weather];document.getElementById('weatherTag').innerHTML='<span>'+w.ico+'</span><span>'+w.lbl+'</span>';}
+function cycleTime(){S.time=(S.time+1)%TIMES.length;const t=TIMES[S.time];document.getElementById('timeTag').innerHTML='<span>🕐</span><span>'+t.lbl+'</span>';}
+
+// ═══ 自动补全 ═══
+const aHide={};
+function showAuto(side){const el=document.getElementById(side+'Input'),val=el.value.trim().toLowerCase(),box=document.getElementById(side+'Auto');clearTimeout(aHide[side]);const list=val?PLACES.filter(p=>p.n.includes(val)||p.s.includes(val)).slice(0,5):PLACES.slice(0,5);if(!list.length){box.style.display='none';return;}box.innerHTML=list.map(p=>'<div class="auto-item" onmousedown="selPlace(\''+side+'\',\''+p.n+'\')"><span>📍</span><div><div>'+p.n+'</div><div class="auto-sub">'+p.s+'</div></div></div>').join('');box.style.display='block';}
+function hideAuto(side,d){aHide[side]=setTimeout(()=>{document.getElementById(side+'Auto').style.display='none';},d);}
+function selPlace(side,name){document.getElementById(side+'Input').value=name;document.getElementById(side+'Auto').style.display='none';}
+function setKm(km){document.getElementById('kmInput').value=km;document.getElementById('minInput').value=Math.round(km/25*60);}
+function setCustomKm(){const v=prompt('输入自定义距离（km）：');if(v&&!isNaN(v)&&parseFloat(v)>0)setKm(parseFloat(v));}
+function swapLoc(){const f=document.getElementById('fromInput'),t=document.getElementById('toInput');[f.value,t.value]=[t.value,f.value];}
+
+// ═══ 定价引擎 ═══
+function calcPrice(p,km,min){
+  const wm=WEATHERS[S.weather].mult,tm=TIMES[S.time].mult,surge=0.88+Math.random()*0.24;
+  if(p.type==='ridehail')return Math.round((14+km*2.3+min*.5)*wm*tm*surge*10)/10;
+  return Math.round((10+km*1.2)*10)/10;
+}
+
+// ═══ 搜索 ═══
 function runSearch(){
-    const km = parseFloat(document.getElementById('kmInput').value) || 10;
-    const min = parseFloat(document.getElementById('minInput').value) || 20;
-    
-    // 简单算法
-    const res = PLATFORMS.map(p => {
-        let price = p.type === 'ridehail' ? (14 + km*2.3 + min*0.5) : (10 + km*1.2);
-        return {...p, price: Math.round(price * 10)/10};
-    }).sort((a,b)=>a.price - b.price);
-
-    const diff = res[res.length-1].price - res[0].price;
-    totalSaved += diff;
-    document.getElementById('totalSaved').textContent = '¥' + totalSaved.toFixed(2);
-
-    document.getElementById('platformCards').innerHTML = res.map((r,i) => `
-        <div class="glass" style="padding:15px; border-left: 4px solid ${r.col}">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <div style="display:flex; align-items:center; gap:10px;">
-                    <span style="font-size:1.5rem;">${r.ico}</span>
-                    <div>
-                        <div style="font-weight:700;">${r.n}</div>
-                        <div class="label">${r.type==='hitch'?'顺风车':'网约车'}</div>
-                    </div>
-                </div>
-                <div style="text-align:right;">
-                    <div class="price-big" style="color:${r.col}">¥${r.price}</div>
-                    <div class="label">预估价</div>
-                </div>
-            </div>
-            <button class="btn btn-ghost" style="margin-top:10px; font-size:0.8rem;" onclick="window.location.href='${r.link}'">
-                🎟️ ${r.coupon} · 前往领券下单 →
-            </button>
-        </div>
-    `).join('');
-    document.getElementById('passResults').style.display='block';
+  const km=parseFloat(document.getElementById('kmInput').value);
+  const minR=parseFloat(document.getElementById('minInput').value);
+  if(!km||km<.5){showToast('⚠️ 请输入有效里程');return;}
+  const min=minR||Math.round(km/25*60);
+  S.queries++;updStats();saveStats();
+  const btn=document.getElementById('searchBtn'),txt=document.getElementById('searchBtnTxt');
+  btn.style.opacity='.65';btn.style.pointerEvents='none';txt.textContent='⏳ 千问AI正在分析…';
+  setTimeout(()=>{btn.style.opacity='1';btn.style.pointerEvents='';txt.textContent='🔍 全网比价 · 精算套利';renderResults(km,min);},1050);
 }
 
+// ═══ 渲染结果 ═══
+function renderResults(km,min){
+  // 只显示乘客端平台（排除driverOnly）
+  const platforms = PLATFORMS.filter(p=>!p.driverOnly);
+  const res=platforms.map(p=>({...p,price:calcPrice(p,km,min)})).sort((a,b)=>a.price-b.price);
+  const rides=res.filter(r=>r.type==='ridehail'),hitchs=res.filter(r=>r.type==='hitch');
+  const minRide=Math.min(...rides.map(r=>r.price)),minHitch=Math.min(...hitchs.map(r=>r.price));
+  const diff=minRide-minHitch,diffPct=diff/minRide*100;
+
+  document.getElementById('arbAmt').textContent=diff>0?'¥'+diff.toFixed(1)+' 可省':'价差极小';
+  document.getElementById('arbTagWrap').innerHTML=diffPct>=30?'<div class="arb-badge">🔥 极致套利</div>':diff>0?'<div class="tag tg">↓ 有价差</div>':'<div class="tag tb">💤 价格相近</div>';
+  if(diff>0){S.totalSaved+=diff;saveStats();updStats();}
+
+  const maxP=Math.max(...res.map(r=>r.price));
+  document.getElementById('platformCards').innerHTML=res.map((r,i)=>{
+    const top=i===0,bdr=top?'ga':r.type==='hitch'?'gg':'';
+    const barW=Math.min((r.price/(maxP+4))*100,100).toFixed(0);
+    return '<div class="glass p-card '+bdr+'" style="padding:14px;position:relative;overflow:hidden;">'
+      +(top?'<div style="position:absolute;top:0;right:0;background:#F59E0B;color:#020617;font-size:.62rem;font-weight:800;padding:3px 10px;border-bottom-left-radius:10px;">最优解</div>':'')
+      +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">'
+        +'<div style="display:flex;align-items:center;gap:10px;">'
+          +'<div style="width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.09);font-size:1.2rem;flex-shrink:0;">'+r.ico+'</div>'
+          +'<div><div style="font-weight:600;font-size:.88rem;color:#F1F5F9;">'+r.n+'</div>'
+          +'<div class="label" style="margin-top:2px;">'+(r.type==='hitch'?'顺风车 · 固定价':'网约车 · 快车/专车')+'</div></div>'
+        +'</div>'
+        +'<div style="text-align:right;flex-shrink:0;"><div class="price-big" style="color:'+r.col+';">¥'+r.price.toFixed(1)+'</div><div class="label">预估费用</div></div>'
+      +'</div>'
+      +'<div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px;">'
+        +'<div class="tag tn">🛣️ '+km+'km</div>'
+        +(r.type==='ridehail'?'<div class="tag tn">⏱️ ~'+min+'min</div>':'')
+        +(r.type==='ridehail'?'<div class="tag ta">'+WEATHERS[S.weather].ico+' '+TIMES[S.time].lbl+'</div>':'<div class="tag tg">🏷️ 一口价</div>')
+        +(i===0?'<div class="tag tg">👑 最省</div>':'')
+      +'</div>'
+      +'<div class="meter" style="margin-bottom:10px;"><div class="meter-fill" style="width:'+barW+'%;background:'+r.col+';"></div></div>'
+      +'<button class="btn btn-ghost" onclick="openPlatform(\''+r.url+'\',\''+r.n+'\')" style="font-size:.78rem;padding:10px 14px;">🎟️ '+r.coupon+' · 立即领取跳转 <span style="opacity:.4;">→</span></button>'
+    +'</div>';
+  }).join('');
+
+  document.getElementById('passResults').style.display='block';
+  setTimeout(()=>document.getElementById('passResults').scrollIntoView({behavior:'smooth',block:'start'}),150);
+  setTimeout(()=>genAI(res,km,min,diff,diffPct),700);
+}
+
+// ═══ 平台跳转（真实链接）═══
+function openPlatform(url,name){
+  if(url && url!=='#hello' && url.startsWith('http')){
+    showToast('🚀 正在跳转至 '+name+'…');
+    setTimeout(()=>window.open(url,'_blank'),300);
+  } else {
+    showToast('⏳ '+name+' 链接即将接入');
+  }
+}
+
+// ═══ 千问 AI 核心 ═══
+async function genAI(res,km,min,diff,diffPct){
+  const el=document.getElementById('aiOutput');
+  el.innerHTML='<div class="dots"><span></span><span></span><span></span></div>';
+  const engine=localStorage.getItem('zt_engine')||'qwen';
+  await new Promise(r=>setTimeout(r,800));
+
+  const prompt='你是Zenith出行首席精算师Sunny，性格犀利、接地气，喜欢用数据说话。请针对以下出行数据给出决策建议，控制在150字以内，语气要像毒舌财经分析师：\n'
+    +'行程：'+km+'km，预计'+min+'分钟，当前'+WEATHERS[S.weather].lbl+'天气，'+TIMES[S.time].lbl+'时段。\n'
+    +'比价结果：最优方案「'+res[0].n+'」¥'+res[0].price.toFixed(1)+'，最贵「'+res[res.length-1].n+'」¥'+res[res.length-1].price.toFixed(1)+'，顺风车与网约车差价¥'+Math.max(0,diff).toFixed(1)+'（'+Math.max(0,diffPct).toFixed(0)+'%）。\n'
+    +'输出格式：①最优选择及理由 ②等待时间成本分析 ③一句扎心提醒。';
+
+  if(engine==='demo'){
+    const w=WEATHERS[S.weather],t=TIMES[S.time];
+    let txt;
+    if(diff<=0)txt='📊 差价不足5%，别纠结直接约最快的。'+(t.mult>1.1?'⚠️ '+t.lbl+'路况复杂，提前出发。':'')+'时间比差价值钱。';
+    else if(diffPct>=30)txt='🔥 套利空间'+diffPct.toFixed(0)+'%！顺风车省¥'+diff.toFixed(1)+'。'+(w.mult>1?w.ico+'溢价'+Math.round((w.mult-1)*100)+'%，顺风车固定价完全不受影响。':'')+'等15分钟就回本。';
+    else txt='💡 网约车贵¥'+diff.toFixed(1)+'，'+(t.mult>1.15?t.lbl+'平台在割韭菜，':'时段尚可，')+'不急就选顺风车。';
+    typeText(el,txt);return;
+  }
+
+  // 获取API Key
+  let key='',apiUrl='',model='',headers={};
+  if(engine==='qwen'){
+    key=localStorage.getItem('zt_qwen')||DEFAULT_QWEN_KEY;
+    apiUrl=QWEN_API; model='qwen-plus';
+    headers={'Content-Type':'application/json','Authorization':'Bearer '+key};
+  } else if(engine==='openai'){
+    key=localStorage.getItem('zt_openai')||''; apiUrl='https://api.openai.com/v1/chat/completions'; model='gpt-4o-mini';
+    headers={'Content-Type':'application/json','Authorization':'Bearer '+key};
+  } else if(engine==='claude'){
+    key=localStorage.getItem('zt_claude')||''; apiUrl='https://api.anthropic.com/v1/messages'; model='claude-3-haiku-20240307';
+    headers={'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01'};
+  } else if(engine==='deepseek'){
+    key=localStorage.getItem('zt_ds')||''; apiUrl='https://api.deepseek.com/chat/completions'; model='deepseek-chat';
+    headers={'Content-Type':'application/json','Authorization':'Bearer '+key};
+  }
+
+  if(!key){typeText(el,'⚠️ 未配置API Key，点击⚙️设置。');return;}
+
+  try{
+    let txt='';
+    if(engine==='claude'){
+      const r=await fetch(apiUrl,{method:'POST',headers,body:JSON.stringify({model,max_tokens:300,messages:[{role:'user',content:prompt}]})});
+      const d=await r.json();
+      if(d.error){typeText(el,'⚠️ '+d.error.message);return;}
+      txt=d.content?.[0]?.text||'无法获取回复';
+    } else {
+      const r=await fetch(apiUrl,{method:'POST',headers,body:JSON.stringify({model,messages:[{role:'system',content:'你是Zenith出行首席精算师Sunny，专业、犀利、接地气。'},{role:'user',content:prompt}],max_tokens:300})});
+      const d=await r.json();
+      if(d.error){typeText(el,'⚠️ '+( d.error.message||JSON.stringify(d.error)));return;}
+      txt=d.choices?.[0]?.message?.content||'无法获取回复';
+    }
+    typeText(el,txt);
+  }catch(e){
+    typeText(el,'⚠️ 网络请求失败：'+e.message+'。请检查网络或API Key。');
+  }
+}
+
+function typeText(el,txt){el.textContent='';let i=0;const iv=setInterval(()=>{el.textContent+=txt[i++];if(i>=txt.length)clearInterval(iv);},18);}
+
+// ═══ 设置 ═══
+function openSettings(){
+  document.getElementById('keyQwen').value=localStorage.getItem('zt_qwen')||DEFAULT_QWEN_KEY;
+  document.getElementById('keyOpenAI').value=localStorage.getItem('zt_openai')||'';
+  document.getElementById('keyClaude').value=localStorage.getItem('zt_claude')||'';
+  document.getElementById('keyDS').value=localStorage.getItem('zt_ds')||'';
+  document.getElementById('aiEngine').value=localStorage.getItem('zt_engine')||'qwen';
+  document.getElementById('settingsDrawer').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeSettings(){document.getElementById('settingsDrawer').classList.remove('open');document.body.style.overflow='';}
+function saveSettings(){
+  localStorage.setItem('zt_qwen',document.getElementById('keyQwen').value.trim());
+  localStorage.setItem('zt_openai',document.getElementById('keyOpenAI').value.trim());
+  localStorage.setItem('zt_claude',document.getElementById('keyClaude').value.trim());
+  localStorage.setItem('zt_ds',document.getElementById('keyDS').value.trim());
+  localStorage.setItem('zt_engine',document.getElementById('aiEngine').value);
+  closeSettings();updEngineBadge();showToast('✅ 配置已保存');
+}
+function clearKeys(){if(!confirm('确认清除？'))return;['zt_qwen','zt_openai','zt_claude','zt_ds','zt_engine'].forEach(k=>localStorage.removeItem(k));closeSettings();updEngineBadge();showToast('🗑️ 已清除');}
+
+// ═══ 司机精算 ═══
+let dComm=0.23,dEnergy=0.65;
+function setComm(v,btn){dComm=v;['c23','c20','c18','c15'].forEach(id=>document.getElementById(id).className='tag tn');btn.className='tag ta';}
+function setEnergy(v,btn){dEnergy=v;['eEV','eGas','eHyb'].forEach(id=>document.getElementById(id).className='tag tn');btn.className='tag ta';}
 function calcDriver(){
-    const amt = parseFloat(document.getElementById('dAmt').value) || 0;
-    const net = amt * 0.75; // 假设抽成25%
-    const el = document.getElementById('driverResult');
-    el.style.display = 'block';
-    el.innerHTML = `
-        <div class="glass" style="padding:15px; border: 1px solid var(--green);">
-            <div class="label">到手纯利 (预估)</div>
-            <div class="price-big" style="color:var(--green); margin:10px 0;">¥${net.toFixed(2)}</div>
-            <div style="font-size:0.8rem; color:var(--muted); margin-bottom:15px;">扣除平台抽成后利润。想赚更多？加入花小猪官方司机团。</div>
-            <button class="btn btn-amber" onclick="window.location.href='${MY_LINKS.hxz_driver}'">🚀 成为花小猪司机 · 领注册奖金</button>
-        </div>
-    `;
+  const amt=parseFloat(document.getElementById('dAmt').value),km=parseFloat(document.getElementById('dKm').value),min=parseFloat(document.getElementById('dMin').value);
+  if(!amt||amt<=0){showToast('⚠️ 请输入订单金额');return;}
+  if(!km||km<=0){showToast('⚠️ 请输入里程');return;}
+  if(!min||min<=0){showToast('⚠️ 请输入时长');return;}
+  const comm=amt*dComm,energy=km*dEnergy,depr=km*.15,net=amt-comm-energy-depr,hr=net/(min/60),per=net/km;
+  let rating,rc,ri;
+  if(hr>=45){rating='黄金肥单';rc='#F59E0B';ri='👑';}
+  else if(hr>=20){rating='路费单';rc='#3B82F6';ri='⛽';}
+  else{rating='公益空跑';rc='#EF4444';ri='💸';}
+  const el=document.getElementById('driverResult');el.style.display='block';
+  document.getElementById('driverResultContent').innerHTML=
+    '<div style="text-align:center;margin-bottom:16px;"><div style="font-size:2.2rem;margin-bottom:6px;">'+ri+'</div>'
+    +'<div style="font-size:1.05rem;font-weight:800;color:'+rc+';">【'+rating+'】</div>'
+    +'<div style="font-size:.74rem;color:var(--muted);margin-top:4px;">综合评定 · 实时精算</div></div>'
+    +'<div style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px;">'
+    +r2('📦 订单毛收入','¥'+amt.toFixed(2),'#F1F5F9',false)
+    +r2('🏢 平台抽成 ('+Math.round(dComm*100)+'%)','− ¥'+comm.toFixed(2),'#EF4444',false)
+    +r2('⛽ 能源成本','− ¥'+energy.toFixed(2),'#F59E0B',false)
+    +r2('🔧 车辆折旧','− ¥'+depr.toFixed(2),'rgba(255,255,255,.5)',false)
+    +'<div class="hr"></div>'
+    +r2('💰 净到手','¥'+net.toFixed(2),net>0?'#10B981':'#EF4444',true)
+    +'</div>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">'
+    +'<div class="glass" style="padding:10px;text-align:center;"><div class="label" style="margin-bottom:4px;">每公里净利</div><div style="font-family:var(--mono);font-size:1.1rem;font-weight:700;color:#3B82F6;">¥'+per.toFixed(2)+'</div></div>'
+    +'<div class="glass" style="padding:10px;text-align:center;"><div class="label" style="margin-bottom:4px;">折算时薪</div><div style="font-family:var(--mono);font-size:1.1rem;font-weight:700;color:'+rc+';">¥'+Math.max(0,hr).toFixed(0)+'/h</div></div>'
+    +'</div>'
+    +'<div class="label" style="margin-bottom:6px;">净利率</div>'
+    +'<div class="meter"><div class="meter-fill" style="width:'+Math.min(Math.max((net/amt)*100,0),100).toFixed(0)+'%;background:'+(net>0?'#10B981':'#EF4444')+';"></div></div>'
+    +'<div style="font-size:.7rem;color:var(--muted);text-align:right;margin-top:4px;">'+Math.max(0,(net/amt)*100).toFixed(1)+'% 利润率</div>'
+    +'<div class="hr"></div>'
+    +'<button class="btn btn-amber" onclick="openPlatform(\'https://v.didi.cn/nDzqX73?source_id=458986jutuike123456&ref_from=dunion\',\'花小猪司机端\')" style="margin-top:4px;">🚗 花小猪司机注册 · 领奖励</button>';
+  el.scrollIntoView({behavior:'smooth'});
 }
+function r2(lbl,val,col,bold){return'<div style="display:flex;justify-content:space-between;align-items:center;"><div style="font-size:.82rem;color:var(--muted);">'+lbl+'</div><div style="font-family:var(--mono);font-size:.88rem;font-weight:'+(bold?700:500)+';color:'+col+';">'+val+'</div></div>';}
+
+function toggleDis(){const b=document.getElementById('dis-body'),a=document.getElementById('dis-arrow');b.classList.toggle('open');a.textContent=b.classList.contains('open')?'▲':'▼';}
+function showToast(msg){let t=document.getElementById('toast');if(!t){t=document.createElement('div');t.id='toast';t.style.cssText='position:fixed;bottom:26px;left:50%;transform:translateX(-50%);background:#1e2d45;border:1px solid rgba(255,255,255,.12);color:#F1F5F9;padding:10px 20px;border-radius:99px;font-size:.82rem;z-index:600;white-space:nowrap;box-shadow:0 8px 30px rgba(0,0,0,.5);transition:opacity .3s;pointer-events:none;';document.body.appendChild(t);}t.textContent=msg;t.style.opacity='1';clearTimeout(t._t);t._t=setTimeout(()=>t.style.opacity='0',2600);}
 </script>
 </body>
 </html>
