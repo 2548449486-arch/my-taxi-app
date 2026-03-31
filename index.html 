@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="color-scheme" content="dark">
+<title>Zenith Travel Hub · 全网出行决策套利中心</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* 样式保留你最喜欢的黑金玻璃拟态风格 */
+:root {
+  --bg: #020617; --surface: rgba(255,255,255,0.05); --border: rgba(255,255,255,0.09);
+  --amber: #F59E0B; --green: #10B981; --blue: #3B82F6; --red: #EF4444;
+  --text: #F1F5F9; --muted: rgba(241,245,249,0.45); --font: 'Sora', sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
+body{background-color:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+#bg-mesh{position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse 70% 55% at 15% 8%,rgba(245,158,11,0.09) 0%,transparent 60%);background-color:#020617}
+.glass{background:rgba(255,255,255,0.05);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.09);border-radius:18px}
+.label{font-family:'JetBrains Mono';font-size:.64rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.price-big{font-family:'JetBrains Mono';font-size:1.85rem;font-weight:700}
+.tag{display:inline-flex;padding:4px 11px;border-radius:99px;font-size:.7rem;font-weight:600;border:1px solid transparent}
+.ta{background:rgba(245,158,11,.13);color:var(--amber);border-color:rgba(245,158,11,.25)}
+.tg{background:rgba(16,185,129,.13);color:var(--green);border-color:rgba(16,185,129,.25)}
+.tn{background:rgba(255,255,255,.05);color:var(--muted)}
+.btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:12px;border-radius:12px;border:none;cursor:pointer;font-weight:600;transition:all .2s}
+.btn-amber{background:var(--amber);color:#020617;box-shadow:0 4px 20px rgba(245,158,11,.32)}
+.btn-ghost{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);color:#F1F5F9}
+.toggle-wrap{display:inline-flex;background:rgba(255,255,255,.06);border-radius:99px;padding:3px}
+.tog-btn{padding:8px 20px;border-radius:99px;border:none;font-size:.8rem;cursor:pointer;background:transparent;color:var(--muted)}
+.tog-btn.active{background:var(--amber);color:#020617}
+.inp-wrap{position:relative;margin-bottom:12px}
+.inp-wrap input{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:13px 40px;color:#fff;outline:none}
+.inp-ico{position:absolute;left:14px;top:50%;transform:translateY(-50%)}
+#searchBtn{width:100%;padding:15px;border-radius:14px;background:var(--amber);color:#020617;font-weight:700;border:none;box-shadow:0 8px 30px rgba(245,158,11,.3);cursor:pointer}
+</style>
+</head>
+<body>
+
+<div id="bg-mesh"></div>
+
+<div id="app" style="max-width:480px;margin:0 auto;padding:20px 14px;position:relative;z-index:1;">
+  <header style="display:flex;justify-content:space-between;margin-bottom:20px;">
+    <div>
+      <div style="font-weight:800;font-size:1.1rem;color:var(--amber);">ZENITH TRAVEL</div>
+      <div class="label" style="color:var(--green);">● 系统分销已激活</div>
+    </div>
+    <div class="glass" style="padding:5px 12px; display:flex; flex-direction:column; align-items:flex-end;">
+      <div class="label">累计套利</div>
+      <div id="totalSaved" style="color:var(--amber); font-weight:700;">¥0.00</div>
+    </div>
+  </header>
+
+  <div style="display:flex;justify-content:center;margin-bottom:20px;">
+    <div class="toggle-wrap">
+      <button class="tog-btn active" id="modeP" onclick="setMode('passenger')">🧍 乘客省钱</button>
+      <button class="tog-btn" id="modeD" onclick="setMode('driver')">🚗 司机赚钱</button>
+    </div>
+  </div>
+
+  <div class="glass" id="searchSection" style="padding:20px;margin-bottom:20px;">
+    <div class="inp-wrap"><span class="inp-ico">🟢</span><input type="text" id="fromInput" placeholder="输入起点"></div>
+    <div class="inp-wrap"><span class="inp-ico">🔴</span><input type="text" id="toInput" placeholder="输入终点"></div>
+    <div style="display:flex;gap:10px;margin-bottom:15px;">
+      <div class="inp-wrap" style="flex:1;margin:0;"><span class="inp-ico">🛣️</span><input type="number" id="kmInput" placeholder="公里"></div>
+      <div class="inp-wrap" style="flex:1;margin:0;"><span class="inp-ico">⏱️</span><input type="number" id="minInput" placeholder="分钟"></div>
+    </div>
+    <button id="searchBtn" onclick="runSearch()">🔍 全网比价 · 实时获利</button>
+  </div>
+
+  <div id="passResults" style="display:none;">
+    <div class="label" style="margin-bottom:10px;">🏆 最优获利方案</div>
+    <div id="platformCards" style="display:flex;flex-direction:column;gap:12px;"></div>
+  </div>
+
+  <div id="driverPanel" style="display:none;">
+    <div class="glass" style="padding:20px;">
+        <div class="label" style="margin-bottom:15px;">🧮 司机净利计算器</div>
+        <div class="inp-wrap"><span class="inp-ico">💴</span><input type="number" id="dAmt" placeholder="订单总额"></div>
+        <button class="btn btn-amber" onclick="calcDriver()">开始精算收益</button>
+        <div id="driverResult" style="margin-top:20px; display:none;"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// --- 老板！这里是你的专属收银台配置 ---
+const AMAP_KEY = ''; // 预留高德Key
+const MY_LINKS = {
+    didi_cx: "https://vv.didi.cn/jnd2xvz?source_id=458986jutuike123456&ref_from=dunion", // 滴滴打车
+    hxz_new: "https://x.huaxz.cn/R2WQ955?source_id=458986jutuike123456&ref_from=dunion", // 花小猪新客
+    hxz_driver: "https://v.didi.cn/nDzqX73?source_id=458986jutuike123456&ref_from=dunion" // 花小猪司机
+};
+
+const PLATFORMS = [
+  {id:'didi', n:'滴滴快车', ico:'🚖', type:'ridehail', col:'#F59E0B', link: MY_LINKS.didi_cx, coupon:'领¥5券下单'},
+  {id:'hxz', n:'花小猪', ico:'🐷', type:'ridehail', col:'#EC4899', link: MY_LINKS.hxz_new, coupon:'新客立减¥8'},
+  {id:'hello', n:'哈啰顺风车', ico:'💨', type:'hitch', col:'#10B981', link: MY_LINKS.didi_cx, coupon:'特价一口价'},
+  {id:'dida', n:'嘀嗒顺风车', ico:'👍', type:'hitch', col:'#A78BFA', link: MY_LINKS.didi_cx, coupon:'极速接单'}
+];
+
+let totalSaved = 0;
+
+function setMode(m){
+    document.getElementById('modeP').classList.toggle('active',m==='passenger');
+    document.getElementById('modeD').classList.toggle('active',m==='driver');
+    document.getElementById('searchSection').style.display=m==='passenger'?'block':'none';
+    document.getElementById('driverPanel').style.display=m==='driver'?'block':'none';
+    document.getElementById('passResults').style.display='none';
+}
+
+function runSearch(){
+    const km = parseFloat(document.getElementById('kmInput').value) || 10;
+    const min = parseFloat(document.getElementById('minInput').value) || 20;
+    
+    // 简单算法
+    const res = PLATFORMS.map(p => {
+        let price = p.type === 'ridehail' ? (14 + km*2.3 + min*0.5) : (10 + km*1.2);
+        return {...p, price: Math.round(price * 10)/10};
+    }).sort((a,b)=>a.price - b.price);
+
+    const diff = res[res.length-1].price - res[0].price;
+    totalSaved += diff;
+    document.getElementById('totalSaved').textContent = '¥' + totalSaved.toFixed(2);
+
+    document.getElementById('platformCards').innerHTML = res.map((r,i) => `
+        <div class="glass" style="padding:15px; border-left: 4px solid ${r.col}">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <span style="font-size:1.5rem;">${r.ico}</span>
+                    <div>
+                        <div style="font-weight:700;">${r.n}</div>
+                        <div class="label">${r.type==='hitch'?'顺风车':'网约车'}</div>
+                    </div>
+                </div>
+                <div style="text-align:right;">
+                    <div class="price-big" style="color:${r.col}">¥${r.price}</div>
+                    <div class="label">预估价</div>
+                </div>
+            </div>
+            <button class="btn btn-ghost" style="margin-top:10px; font-size:0.8rem;" onclick="window.location.href='${r.link}'">
+                🎟️ ${r.coupon} · 前往领券下单 →
+            </button>
+        </div>
+    `).join('');
+    document.getElementById('passResults').style.display='block';
+}
+
+function calcDriver(){
+    const amt = parseFloat(document.getElementById('dAmt').value) || 0;
+    const net = amt * 0.75; // 假设抽成25%
+    const el = document.getElementById('driverResult');
+    el.style.display = 'block';
+    el.innerHTML = `
+        <div class="glass" style="padding:15px; border: 1px solid var(--green);">
+            <div class="label">到手纯利 (预估)</div>
+            <div class="price-big" style="color:var(--green); margin:10px 0;">¥${net.toFixed(2)}</div>
+            <div style="font-size:0.8rem; color:var(--muted); margin-bottom:15px;">扣除平台抽成后利润。想赚更多？加入花小猪官方司机团。</div>
+            <button class="btn btn-amber" onclick="window.location.href='${MY_LINKS.hxz_driver}'">🚀 成为花小猪司机 · 领注册奖金</button>
+        </div>
+    `;
+}
+</script>
+</body>
+</html>
