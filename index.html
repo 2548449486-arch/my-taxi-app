@@ -3,832 +3,1287 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<meta name="theme-color" content="#080E1A">
+<meta name="theme-color" content="#060D1A">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Sunny AI">
-<title>Sunny AI · 出行决策助手</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<title>Sunny AI · 智能出行助手</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
-html,body{background:#080E1A!important;color:#F1F5F9;font-family:'DM Sans',-apple-system,sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased;overflow-x:hidden}
-#root{min-height:100vh}
-input,select,button,textarea{font-family:'DM Sans',-apple-system,sans-serif}
-input:focus{outline:none}
-select:focus{outline:none}
+html{background:#060D1A!important;height:100%}
+body{background:#060D1A!important;color:#F1F5F9;font-family:-apple-system,'SF Pro Display','PingFang SC','Helvetica Neue',sans-serif;height:100%;overflow:hidden;-webkit-font-smoothing:antialiased}
+input,select,button,textarea{font-family:inherit;-webkit-appearance:none;appearance:none}
 input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
+::-webkit-scrollbar{width:2px}
+::-webkit-scrollbar-thumb{background:rgba(245,158,11,.2);border-radius:99px}
 
-/* BG */
-#bg-layer{position:fixed;inset:0;pointer-events:none;z-index:0;
-  background:
-    radial-gradient(ellipse 70% 55% at 5% 8%, rgba(245,158,11,.07) 0%, transparent 55%),
-    radial-gradient(ellipse 55% 50% at 90% 88%, rgba(99,102,241,.06) 0%, transparent 55%),
-    radial-gradient(ellipse 45% 40% at 55% 40%, rgba(20,184,166,.04) 0%, transparent 50%),
-    #080E1A;
-}
-#grid-layer{position:fixed;inset:0;pointer-events:none;z-index:0;
-  background-image:linear-gradient(rgba(255,255,255,.013) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.013) 1px,transparent 1px);
-  background-size:48px 48px;
-}
+/* ── BG ── */
+#bg{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse 80% 60% at 0% 0%,rgba(245,158,11,.07) 0%,transparent 50%),
+    radial-gradient(ellipse 60% 50% at 100% 100%,rgba(99,102,241,.06) 0%,transparent 50%),
+    radial-gradient(ellipse 50% 40% at 60% 40%,rgba(20,184,166,.04) 0%,transparent 50%),
+    #060D1A}
+#grid{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:linear-gradient(rgba(255,255,255,.012) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.012) 1px,transparent 1px);
+  background-size:52px 52px}
 
-/* SPLASH */
+/* ── SPLASH ── */
+#splash{position:fixed;inset:0;z-index:9999;background:#060D1A;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;transition:opacity .6s}
+#splash.out{opacity:0;pointer-events:none}
+.s-ring{position:absolute;inset:-14px;border-radius:50%;filter:blur(5px);animation:rayRot 8s linear infinite;
+  background:conic-gradient(from 0deg,transparent 0deg,rgba(245,158,11,.7) 10deg,transparent 20deg,transparent 30deg,rgba(245,158,11,.55) 40deg,transparent 50deg,transparent 60deg,rgba(245,158,11,.65) 70deg,transparent 80deg,transparent 90deg,rgba(245,158,11,.5) 100deg,transparent 110deg,transparent 120deg,rgba(245,158,11,.6) 130deg,transparent 140deg,transparent 150deg,rgba(245,158,11,.55) 160deg,transparent 170deg,transparent 180deg,rgba(245,158,11,.5) 190deg,transparent 200deg,transparent 210deg,rgba(245,158,11,.6) 220deg,transparent 230deg,transparent 240deg,rgba(245,158,11,.55) 250deg,transparent 260deg,transparent 270deg,rgba(245,158,11,.5) 280deg,transparent 290deg,transparent 300deg,rgba(245,158,11,.6) 310deg,transparent 320deg,transparent 330deg,rgba(245,158,11,.55) 340deg,transparent 350deg,transparent)}
+.s-glow{position:absolute;inset:-4px;border-radius:50%;background:radial-gradient(circle,rgba(245,158,11,.2) 30%,transparent 70%);animation:sPulse 2.2s ease-in-out infinite}
+.s-core{position:relative;z-index:1;width:76px;height:76px;border-radius:50%;background:#060D1A;border:2px solid rgba(245,158,11,.5);display:flex;align-items:center;justify-content:center;font-size:2.1rem}
+.s-wrap{position:relative;width:76px;height:76px;display:flex;align-items:center;justify-content:center}
+.s-bar{width:150px;height:2px;background:rgba(255,255,255,.07);border-radius:99px;overflow:hidden}
+.s-fill{height:100%;width:0;background:linear-gradient(90deg,#F59E0B,#FCD34D);border-radius:99px;animation:sFill 2s cubic-bezier(.4,0,.2,1) forwards}
+.s-title{font-size:.95rem;font-weight:800;letter-spacing:.22em;color:#F59E0B}
+.s-status{font-size:.6rem;color:rgba(255,255,255,.2);animation:blink .9s steps(1) infinite;letter-spacing:.06em}
+
+/* ── ANIMATIONS ── */
 @keyframes rayRot{to{transform:rotate(360deg)}}
-@keyframes sunPulse{0%,100%{opacity:.6;transform:scale(1)}50%{opacity:1;transform:scale(1.1)}}
-@keyframes sfill{from{width:0}to{width:100%}}
+@keyframes sPulse{0%,100%{opacity:.6;transform:scale(1)}50%{opacity:1;transform:scale(1.1)}}
+@keyframes sFill{from{width:0}to{width:100%}}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
-@keyframes dotPulse{0%,80%,100%{transform:scale(.65);opacity:.3}40%{transform:scale(1.2);opacity:1}}
-@keyframes cin{from{opacity:0;transform:translateY(18px) scale(.96)}to{opacity:1;transform:none}}
-@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+@keyframes cin{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:none}}
+@keyframes slideIn{from{opacity:0;transform:translateX(24px)}to{opacity:1;transform:none}}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 @keyframes spin{to{transform:rotate(360deg)}}
-@keyframes shimmer{0%,100%{opacity:.35}50%{opacity:.9}}
-@keyframes glowPulse{0%,100%{box-shadow:0 0 0 0 rgba(245,158,11,0)}50%{box-shadow:0 0 0 8px rgba(245,158,11,.08)}}
+@keyframes dp{0%,80%,100%{transform:scale(.6);opacity:.25}40%{transform:scale(1.2);opacity:1}}
+@keyframes shimmer{0%,100%{opacity:.28}50%{opacity:.9}}
+@keyframes glowP{0%,100%{box-shadow:0 0 0 0 rgba(245,158,11,0)}50%{box-shadow:0 0 0 10px rgba(245,158,11,.07)}}
+@keyframes ticker{0%{transform:translateX(100%)}100%{transform:translateX(-100%)}}
+@keyframes pulse2{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes countUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 
-.splash-ring{position:absolute;inset:-14px;border-radius:50%;
-  background:conic-gradient(from 0deg,transparent 0deg,rgba(245,158,11,.7) 10deg,transparent 20deg,transparent 30deg,rgba(245,158,11,.55) 40deg,transparent 50deg,transparent 60deg,rgba(245,158,11,.6) 70deg,transparent 80deg,transparent 90deg,rgba(245,158,11,.5) 100deg,transparent 110deg,transparent 120deg,rgba(245,158,11,.55) 130deg,transparent 140deg,transparent 150deg,rgba(245,158,11,.6) 160deg,transparent 170deg,transparent 180deg,rgba(245,158,11,.5) 190deg,transparent 200deg,transparent 210deg,rgba(245,158,11,.55) 220deg,transparent 230deg,transparent 240deg,rgba(245,158,11,.6) 250deg,transparent 260deg,transparent 270deg,rgba(245,158,11,.5) 280deg,transparent 290deg,transparent 300deg,rgba(245,158,11,.55) 310deg,transparent 320deg,transparent 330deg,rgba(245,158,11,.6) 340deg,transparent 350deg,transparent 360deg);
-  filter:blur(5px);animation:rayRot 8s linear infinite}
-.splash-glow{position:absolute;inset:-4px;border-radius:50%;
-  background:radial-gradient(circle,rgba(245,158,11,.18) 30%,transparent 70%);
-  animation:sunPulse 2.2s ease-in-out infinite}
-.splash-bar-fill{height:100%;width:0;background:linear-gradient(90deg,#F59E0B,#FBBF24);border-radius:99px;animation:sfill 2.1s cubic-bezier(.4,0,.2,1) forwards}
+/* ── APP SHELL ── */
+#shell{position:fixed;inset:0;z-index:1;display:flex;flex-direction:column;visibility:hidden}
+#shell.on{visibility:visible}
 
-.dot{animation:dotPulse 1.2s ease-in-out infinite}
-.d0{animation-delay:0s}.d1{animation-delay:.18s}.d2{animation-delay:.36s}
+/* STATUS BAR */
+#statusBar{flex-shrink:0;padding:10px 16px 8px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.055)}
+.sb-brand{display:flex;align-items:center;gap:7px}
+.sb-star{font-size:1rem;color:#F59E0B}
+.sb-name{font-weight:800;font-size:.82rem;letter-spacing:.08em}
+.sb-live{background:rgba(20,184,166,.12);border:1px solid rgba(20,184,166,.28);border-radius:99px;padding:1px 7px;font-size:.55rem;font-weight:700;color:#14B8A6;letter-spacing:.06em}
+.sb-right{display:flex;align-items:center;gap:10px}
+.sb-city{font-size:.65rem;color:rgba(255,255,255,.38);display:flex;align-items:center;gap:4px}
+.sb-time{font-size:.65rem;color:rgba(255,255,255,.28);font-variant-numeric:tabular-nums}
+.sb-saved{font-size:.63rem;color:#10B981;font-weight:600}
 
-.pc{animation:cin .38s cubic-bezier(.34,1.5,.64,1) both}
-.pc0{animation-delay:0s}.pc1{animation-delay:.07s}.pc2{animation-delay:.14s}
-.pc3{animation-delay:.21s}.pc4{animation-delay:.28s}.pc5{animation-delay:.35s}
-.pc6{animation-delay:.42s}.pc7{animation-delay:.49s}.pc8{animation-delay:.56s}
+/* PAGES */
+#pages{flex:1;overflow:hidden;position:relative}
+.page{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 14px 16px;display:none;animation:slideIn .25s ease both}
+.page.active{display:block}
 
-.slide-up{animation:slideUp .28s cubic-bezier(.34,1.2,.64,1)}
-.fade-in{animation:fadeIn .3s ease}
-.top-shimmer{animation:shimmer 2.4s ease-in-out infinite}
-.best-glow{animation:glowPulse 2.5s ease-in-out infinite}
+/* BOTTOM NAV */
+#nav{flex-shrink:0;display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid rgba(255,255,255,.06);background:rgba(6,13,26,.92);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px)}
+.nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 4px 10px;cursor:pointer;transition:all .18s;-webkit-appearance:none;border:none;background:none;position:relative}
+.nav-item:active{transform:scale(.92)}
+.nav-ico{font-size:1.2rem;transition:transform .2s}
+.nav-lbl{font-size:.54rem;font-weight:600;color:rgba(255,255,255,.3);transition:color .2s;letter-spacing:.03em}
+.nav-item.on .nav-lbl{color:#F59E0B}
+.nav-item.on .nav-ico{transform:scale(1.1)}
+.nav-dot{position:absolute;top:7px;right:calc(50% - 12px);width:5px;height:5px;border-radius:50%;background:#EF4444;display:none}
+.nav-dot.show{display:block}
 
-::-webkit-scrollbar{width:3px}
-::-webkit-scrollbar-thumb{background:rgba(245,158,11,.18);border-radius:99px}
+/* ── COMPONENTS ── */
+.card{background:rgba(255,255,255,.042);-webkit-backdrop-filter:blur(18px) saturate(1.3);backdrop-filter:blur(18px) saturate(1.3);border:1px solid rgba(255,255,255,.075);border-radius:18px}
+.card-amber{border-color:rgba(245,158,11,.28)!important}
+.card-green{border-color:rgba(16,185,129,.25)!important}
+.card-blue{border-color:rgba(59,130,246,.22)!important}
+.card-teal{border-color:rgba(20,184,166,.25)!important}
+.card-purple{border-color:rgba(167,139,250,.22)!important}
+
+.sec{font-size:.58rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.28);display:flex;align-items:center;gap:8px;margin-bottom:11px}
+.sec::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.065)}
+
+.chip{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.08);border-radius:99px;padding:5px 11px;font-size:.68rem;font-weight:600;color:rgba(241,245,249,.6);cursor:pointer;-webkit-appearance:none;border:none;transition:all .15s}
+.chip.on{background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.35);color:#F59E0B}
+.chip:active{transform:scale(.95)}
+
+.inp{width:100%;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:11px 12px;font-size:.86rem;color:#F1F5F9;outline:none;transition:border-color .2s}
+.inp:focus{border-color:rgba(245,158,11,.42)}
+.inp::placeholder{color:rgba(241,245,249,.22)}
+
+.btn-primary{width:100%;padding:14px;border-radius:14px;border:none;background:linear-gradient(135deg,#F59E0B,#D97706);color:#000;font-size:.9rem;font-weight:800;cursor:pointer;box-shadow:0 8px 24px rgba(245,158,11,.28);letter-spacing:.03em;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-primary:active{transform:scale(.97)}
+.btn-primary:disabled{background:rgba(245,158,11,.3);box-shadow:none;color:rgba(0,0,0,.4);cursor:not-allowed}
+.btn-ghost{width:100%;padding:11px;border-radius:12px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);color:rgba(241,245,249,.55);font-size:.8rem;font-weight:600;cursor:pointer}
+.btn-ghost:active{transform:scale(.97)}
+
+.dots{display:flex;gap:4px;align-items:center;padding:3px 0}
+.dot{width:5px;height:5px;border-radius:50%;background:#F59E0B;animation:dp 1.2s ease-in-out infinite}
+.d1{animation-delay:.18s}.d2{animation-delay:.36s}
+
+.spin{width:15px;height:15px;border:2px solid rgba(0,0,0,.18);border-top-color:#000;border-radius:50%;animation:spin .65s linear infinite;flex-shrink:0}
+
+.tag{display:inline-flex;align-items:center;gap:3px;border-radius:99px;padding:3px 8px;font-size:.6rem;font-weight:600}
+.tag-a{background:rgba(245,158,11,.12);color:#F59E0B;border:1px solid rgba(245,158,11,.22)}
+.tag-g{background:rgba(16,185,129,.12);color:#10B981;border:1px solid rgba(16,185,129,.22)}
+.tag-b{background:rgba(59,130,246,.12);color:#60A5FA;border:1px solid rgba(59,130,246,.2)}
+.tag-t{background:rgba(20,184,166,.12);color:#14B8A6;border:1px solid rgba(20,184,166,.2)}
+.tag-p{background:rgba(167,139,250,.12);color:#A78BFA;border:1px solid rgba(167,139,250,.2)}
+.tag-n{background:rgba(255,255,255,.05);color:rgba(255,255,255,.4);border:1px solid rgba(255,255,255,.07)}
+
+/* ── HOME ── */
+.home-hero{padding:14px;margin-bottom:12px;position:relative;overflow:hidden}
+.hero-bg{position:absolute;inset:0;background:linear-gradient(135deg,rgba(245,158,11,.08),rgba(99,102,241,.05));border-radius:18px}
+.city-stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.city-stat{padding:11px 10px;text-align:center}
+.cs-val{font-size:1.25rem;font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
+.cs-lbl{font-size:.58rem;color:rgba(255,255,255,.35);margin-top:3px;letter-spacing:.04em}
+.price-ticker-wrap{overflow:hidden;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.065);border-radius:10px;padding:7px 0;margin-bottom:12px;white-space:nowrap}
+.price-ticker{display:inline-block;animation:ticker 28s linear infinite;font-size:.68rem;color:rgba(255,255,255,.5);font-variant-numeric:tabular-nums}
+.price-ticker span{margin:0 18px}
+.traffic-bar{display:flex;gap:3px;height:6px;border-radius:99px;overflow:hidden;margin-top:7px}
+.tb-seg{flex:1;border-radius:99px;transition:all .5s}
+.ai-insight-mini{background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.18);border-radius:14px;padding:12px;margin-bottom:12px;font-size:.8rem;line-height:1.72;color:#E2E8F0}
+.quick-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+.qa{padding:12px 8px;border-radius:14px;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;-webkit-appearance:none;border:none;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);transition:all .18s}
+.qa:active{transform:scale(.93);background:rgba(245,158,11,.07)}
+.qa-ico{font-size:1.3rem}
+.qa-lbl{font-size:.58rem;color:rgba(255,255,255,.45);font-weight:600}
+.peak-badge{display:inline-flex;align-items:center;gap:5px;border-radius:99px;padding:5px 12px;font-size:.68rem;font-weight:700}
+.peak-on{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.28);color:#EF4444}
+.peak-off{background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.25);color:#10B981}
+.peak-warn{background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.28);color:#F59E0B}
+
+/* ── TRIP PLANNING ── */
+.loc-wrap{position:relative;margin-bottom:12px}
+.loc-from{position:relative;margin-bottom:3px}
+.loc-to{position:relative}
+.loc-dot{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:9px;height:9px;border-radius:50%;z-index:2;pointer-events:none}
+.loc-sq{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:9px;height:9px;border-radius:2px;z-index:2;pointer-events:none}
+.loc-inp{width:100%;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.08);padding:12px 40px 12px 29px;font-size:.86rem;color:#F1F5F9;outline:none;transition:border-color .2s}
+.loc-from .loc-inp{border-radius:12px 12px 3px 3px}
+.loc-to .loc-inp{border-radius:3px 3px 12px 12px}
+.loc-inp:focus{border-color:rgba(245,158,11,.42)}
+.loc-inp::placeholder{color:rgba(241,245,249,.22)}
+.loc-conn{position:absolute;left:16px;top:44px;width:1px;height:18px;background:rgba(255,255,255,.1)}
+.swap-btn{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.24);border-radius:8px;padding:5px 10px;color:#F59E0B;cursor:pointer;font-size:.82rem;z-index:5}
+.swap-btn:active{transform:translateY(-50%) scale(.92)}
+.sugg{position:absolute;top:calc(100% + 3px);left:0;right:0;z-index:80;background:#0A1828;border:1px solid rgba(255,255,255,.1);border-radius:12px;overflow:hidden;box-shadow:0 16px 40px rgba(0,0,0,.7);animation:fadeIn .13s ease}
+.sugg-i{padding:10px 13px;font-size:.8rem;color:#E2E8F0;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.04);display:flex;align-items:center;gap:7px}
+.sugg-i:last-child{border-bottom:none}
+.sugg-i:active{background:rgba(245,158,11,.07)}
+.qdist{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:11px}
+.qd{background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.075);border-radius:99px;padding:5px 11px;font-size:.68rem;font-weight:600;color:rgba(241,245,249,.52);cursor:pointer;-webkit-appearance:none;border:none}
+.qd:active{background:rgba(245,158,11,.12);color:#F59E0B;transform:scale(.93)}
+.km-wrap{position:relative;margin-bottom:13px}
+.km-ico{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,.28);pointer-events:none}
+.km-inp{width:100%;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:11px 12px 11px 34px;font-size:.88rem;color:#F1F5F9;outline:none;transition:border-color .2s}
+.km-inp:focus{border-color:rgba(245,158,11,.42)}
+.km-inp::placeholder{color:rgba(241,245,249,.22)}
+.ctx-chips{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.plan-cards{display:flex;flex-direction:column;gap:9px;margin-bottom:12px}
+.plan-card{border-radius:16px;padding:12px;position:relative;overflow:hidden;cursor:pointer;transition:transform .13s;animation:cin .32s cubic-bezier(.34,1.5,.64,1) both}
+.plan-card:active{transform:scale(.98)}
+.plan-top{position:absolute;top:0;right:0;background:linear-gradient(135deg,#F59E0B,#D97706);color:#000;font-size:.55rem;font-weight:800;padding:3px 9px;border-bottom-left-radius:9px;letter-spacing:.05em}
+.plan-shimmer{position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent 5%,rgba(245,158,11,.8) 50%,transparent 95%);animation:shimmer 2.4s ease-in-out infinite}
+.plan-glow{animation:glowP 2.5s ease-in-out infinite}
+.plan-icon{width:40px;height:40px;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0}
+.plan-price{font-size:1.5rem;font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
+.plan-min{font-size:.58rem;color:rgba(255,255,255,.32);margin-top:2px}
+.eff-ring{position:relative;width:32px;height:32px;flex-shrink:0}
+.eff-svg{transform:rotate(-90deg)}
+.eff-lbl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:.5rem;font-weight:700}
+.matrix{background:rgba(255,255,255,.028);border:1px solid rgba(255,255,255,.065);border-radius:16px;padding:12px;margin-bottom:12px}
+.mrow{display:flex;align-items:center;gap:8px}
+.mbar-w{flex:1;height:4px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden}
+.mbar{height:100%;border-radius:99px}
+.combo-steps{display:flex;align-items:center;margin:7px 0;background:rgba(20,184,166,.04);border:1px solid rgba(20,184,166,.12);border-radius:9px;padding:7px 9px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.cs{display:flex;flex-direction:column;align-items:center;gap:2px;flex-shrink:0;min-width:62px}
+.cs-line{flex:1;height:1px;background:rgba(20,184,166,.18);margin:0 3px;min-width:12px}
+.ctx-result{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:11px}
+.ctx-t{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.065);border-radius:99px;padding:3px 8px;font-size:.62rem;color:rgba(255,255,255,.4)}
+.savings-row{display:flex;align-items:center;justify-content:space-between;background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.2);border-radius:14px;padding:11px 13px;margin-bottom:12px}
+.promo-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.promo-i{background:rgba(255,255,255,.028);border:1px solid rgba(255,255,255,.065);border-radius:13px;padding:11px 9px;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;transition:all .15s;text-align:center}
+.promo-i:active{transform:scale(.96)}
+.back-btn{display:inline-flex;align-items:center;gap:5px;margin-bottom:11px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:99px;padding:6px 13px;color:rgba(255,255,255,.5);font-size:.72rem;cursor:pointer}
+.back-btn:active{transform:scale(.96)}
+.hint{padding:11px 13px;background:rgba(99,102,241,.05);border:1px solid rgba(99,102,241,.14);border-radius:13px;font-size:.7rem;color:rgba(255,255,255,.36);line-height:1.75}
+.hint strong{color:#818CF8}
+
+/* ── AI CHAT ── */
+.chat-header{padding:12px 0 10px;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,.055);margin-bottom:14px}
+.chat-ava{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,rgba(245,158,11,.2),rgba(99,102,241,.15));border:1.5px solid rgba(245,158,11,.38);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;animation:sPulse 2.5s ease-in-out infinite}
+.chat-status{font-size:.6rem;color:#10B981;display:flex;align-items:center;gap:4px;margin-top:2px}
+.chat-status::before{content:'';width:5px;height:5px;border-radius:50%;background:#10B981;display:inline-block;animation:pulse2 1.5s ease-in-out infinite}
+.chat-messages{display:flex;flex-direction:column;gap:12px;padding-bottom:12px;min-height:280px}
+.msg-ai{display:flex;gap:8px;align-items:flex-start;animation:cin .28s ease both}
+.msg-user{display:flex;justify-content:flex-end;animation:cin .28s ease both}
+.bubble-ai{background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.075);border-radius:14px 14px 14px 3px;padding:10px 13px;font-size:.82rem;line-height:1.72;color:#E2E8F0;max-width:88%}
+.bubble-user{background:linear-gradient(135deg,rgba(245,158,11,.18),rgba(245,158,11,.1));border:1px solid rgba(245,158,11,.28);border-radius:14px 14px 3px 14px;padding:10px 13px;font-size:.82rem;line-height:1.72;color:#F1F5F9;max-width:88%;text-align:right}
+.bubble-ai .typing{display:flex;gap:4px;align-items:center;height:18px}
+.q-chips{display:flex;gap:6px;flex-wrap:wrap;padding:10px 0 12px}
+.q-chip{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:99px;padding:6px 13px;font-size:.72rem;color:rgba(241,245,249,.6);cursor:pointer;-webkit-appearance:none;border-color:rgba(255,255,255,.1);transition:all .15s}
+.q-chip:active{background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.28);color:#F59E0B;transform:scale(.96)}
+.chat-input-area{position:sticky;bottom:0;padding-top:10px;background:linear-gradient(transparent,#060D1A 40%)}
+.chat-input-row{display:flex;gap:8px;align-items:flex-end}
+.chat-inp{flex:1;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:11px 13px;font-size:.84rem;color:#F1F5F9;outline:none;resize:none;max-height:100px;line-height:1.5}
+.chat-inp:focus{border-color:rgba(245,158,11,.38)}
+.chat-inp::placeholder{color:rgba(241,245,249,.22)}
+.chat-send{width:42px;height:42px;border-radius:12px;border:none;background:linear-gradient(135deg,#F59E0B,#D97706);display:flex;align-items:center;justify-content:center;font-size:1rem;cursor:pointer;flex-shrink:0}
+.chat-send:active{transform:scale(.9)}
+.chat-send:disabled{background:rgba(245,158,11,.3);cursor:not-allowed}
+
+/* ── ANALYTICS ── */
+.stat-2grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:12px}
+.stat-card{padding:14px;text-align:center}
+.stat-val{font-size:1.8rem;font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
+.stat-lbl{font-size:.6rem;color:rgba(255,255,255,.35);margin-top:4px;letter-spacing:.04em}
+.chart-wrap{margin-bottom:12px}
+.chart-bars{display:flex;align-items:flex-end;gap:5px;height:80px;padding:0 4px}
+.chart-bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.chart-bar{width:100%;border-radius:5px 5px 0 0;transition:height .8s cubic-bezier(.34,1.2,.64,1);min-height:3px}
+.chart-bar-lbl{font-size:.54rem;color:rgba(255,255,255,.28)}
+.mode-row{display:flex;align-items:center;gap:9px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.mode-row:last-child{border-bottom:none}
+.mode-bar-w{flex:1;height:5px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden}
+.mode-bar{height:100%;border-radius:99px;transition:width .9s cubic-bezier(.34,1.2,.64,1)}
+.insight-row{padding:9px 12px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.055);border-radius:11px;margin-bottom:7px;display:flex;gap:9px;align-items:flex-start}
+
+/* ── SETTINGS ── */
+.set-section{margin-bottom:18px}
+.set-row{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.055);border-radius:12px;margin-bottom:7px;cursor:pointer}
+.set-row:active{background:rgba(245,158,11,.06)}
+.set-label{font-size:.82rem;color:#F1F5F9;font-weight:500}
+.set-val{font-size:.75rem;color:rgba(255,255,255,.4)}
+.set-arrow{color:rgba(255,255,255,.2);font-size:.9rem}
+.sel-inp{width:100%;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.08);border-radius:11px;padding:11px 13px;font-size:.84rem;color:#F1F5F9;outline:none;-webkit-appearance:none;appearance:none;margin-bottom:10px}
+.sel-inp:focus{border-color:rgba(245,158,11,.38)}
+.sel-inp option{background:#0A1828}
+.pw-inp{width:100%;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.08);border-radius:11px;padding:11px 13px;font-size:.84rem;color:#F1F5F9;outline:none;margin-bottom:10px}
+.pw-inp:focus{border-color:rgba(245,158,11,.38)}
+.pw-inp::placeholder{color:rgba(241,245,249,.2)}
+.fav-item{display:flex;align-items:center;gap:9px;padding:10px 12px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.055);border-radius:12px;margin-bottom:7px}
+.fav-item:active{background:rgba(245,158,11,.07)}
+
+/* ── DRAWER ── */
+.drawer-ov{position:fixed;inset:0;z-index:500;display:flex;align-items:flex-end;animation:fadeIn .2s ease}
+.drawer-bg{position:absolute;inset:0;background:rgba(0,0,0,.75);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.drawer-panel{position:relative;z-index:1;width:100%;max-height:80vh;overflow-y:auto;-webkit-overflow-scrolling:touch;background:#0A1828;border-radius:22px 22px 0 0;border:1px solid rgba(255,255,255,.09);border-bottom:none;padding:16px 15px 46px;animation:slideUp .26s cubic-bezier(.34,1.2,.64,1)}
+.drawer-hdl{width:36px;height:3px;border-radius:99px;background:rgba(255,255,255,.14);margin:0 auto 15px}
+.drawer-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:15px}
+.drawer-close{background:none;border:none;color:rgba(255,255,255,.35);font-size:1.4rem;cursor:pointer;padding:0 4px}
+.drow{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.drow:last-child{border-bottom:none}
+.dl{font-size:.78rem;color:rgba(255,255,255,.42)}
+.dv{font-size:.78rem;font-weight:600;color:#F1F5F9}
+.drawer-cta{width:100%;margin-top:15px;padding:14px;background:linear-gradient(135deg,#F59E0B,#D97706);border-radius:13px;border:none;color:#000;font-size:.9rem;font-weight:800;cursor:pointer}
+.drawer-cta:active{transform:scale(.98)}
+.drawer-close-btn{width:100%;margin-top:8px;padding:11px;background:rgba(255,255,255,.05);border-radius:12px;border:1px solid rgba(255,255,255,.07);color:rgba(255,255,255,.38);font-size:.8rem;cursor:pointer}
 </style>
 </head>
 <body>
-<div id="bg-layer"></div>
-<div id="grid-layer"></div>
-<div id="root"></div>
+<div id="bg"></div>
+<div id="grid"></div>
 
-<script src="https://cdn.staticfile.net/react/18.2.0/umd/react.production.min.js"></script>
-<script src="https://cdn.staticfile.net/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-<script src="https://cdn.staticfile.net/babel-standalone/7.23.6/babel.min.js"></script>
+<!-- SPLASH -->
+<div id="splash">
+  <div class="s-wrap">
+    <div class="s-ring"></div>
+    <div class="s-glow"></div>
+    <div class="s-core">✦</div>
+  </div>
+  <div class="s-title">SUNNY AI</div>
+  <div class="s-bar"><div class="s-fill"></div></div>
+  <div class="s-status" id="splashTxt">加载城市定价数据库…</div>
+</div>
 
-<script type="text/babel">
-const { useState, useEffect, useRef, useCallback } = React;
+<!-- APP SHELL -->
+<div id="shell">
+  <!-- STATUS BAR -->
+  <div id="statusBar">
+    <div class="sb-brand">
+      <span class="sb-star">✦</span>
+      <span class="sb-name">SUNNY AI</span>
+      <span class="sb-live">LIVE</span>
+    </div>
+    <div class="sb-right">
+      <span class="sb-saved" id="sbSaved" style="display:none"></span>
+      <span class="sb-city" id="sbCity"><span>📍</span><span id="sbCityTxt">定位中</span></span>
+      <span class="sb-time" id="sbTime"></span>
+    </div>
+  </div>
 
-// ========== SAFE STORAGE WRAPPER ==========
-// 解决本地 file:// 协议或部分受限浏览器直接操作 localStorage 引发的崩溃
-const safeStorage = {
-  get: (key, def) => {
-    try { return localStorage.getItem(key) || def; } 
-    catch(e) { return def; }
-  },
-  set: (key, val) => {
-    try { localStorage.setItem(key, val); } 
-    catch(e) {}
-  }
+  <!-- PAGES -->
+  <div id="pages">
+    <!-- HOME -->
+    <div class="page active" id="pageHome">
+      <div class="card card-amber home-hero" style="padding:14px;margin-bottom:11px;position:relative;overflow:hidden">
+        <div class="hero-bg"></div>
+        <div style="position:relative;z-index:1">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+            <div>
+              <div style="font-size:.65rem;color:rgba(255,255,255,.38);margin-bottom:3px">当前出行环境</div>
+              <div style="font-size:1rem;font-weight:800;color:#F1F5F9" id="homeGreeting">早安 ☀️</div>
+            </div>
+            <div id="peakBadge" class="peak-off">🟢 平峰时段</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:7px;margin-bottom:8px">
+            <span id="homeWeatherIco" style="font-size:1.4rem">☀️</span>
+            <div>
+              <div style="font-size:.78rem;font-weight:600" id="homeWeatherTxt">晴天 · 无溢价</div>
+              <div style="font-size:.62rem;color:rgba(255,255,255,.35);margin-top:1px" id="homePeakDesc">现在叫车价格正常，是出行的好时机</div>
+            </div>
+          </div>
+          <div class="traffic-bar" id="trafficBar"></div>
+          <div style="display:flex;justify-content:space-between;margin-top:4px">
+            <span style="font-size:.58rem;color:rgba(255,255,255,.28)">道路通畅</span>
+            <span style="font-size:.58rem;color:rgba(255,255,255,.28)" id="trafficLabel">轻度拥堵</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="city-stat-grid">
+        <div class="card city-stat">
+          <div class="cs-val" id="statRef5" style="color:#F59E0B">—</div>
+          <div class="cs-lbl">5km 参考价</div>
+        </div>
+        <div class="card city-stat">
+          <div class="cs-val" id="statSurge" style="color:#EF4444">×1.0</div>
+          <div class="cs-lbl">当前溢价</div>
+        </div>
+        <div class="card city-stat">
+          <div class="cs-val" id="statWait" style="color:#60A5FA">3min</div>
+          <div class="cs-lbl">预计等车</div>
+        </div>
+      </div>
+
+      <div class="price-ticker-wrap">
+        <div class="price-ticker" id="priceTicker">加载中…</div>
+      </div>
+
+      <div class="card ai-insight-mini" id="homeInsight">
+        <div style="display:flex;align-items:center;gap:7px;margin-bottom:8px">
+          <div style="width:28px;height:28px;border-radius:50%;background:rgba(245,158,11,.15);border:1.5px solid rgba(245,158,11,.32);display:flex;align-items:center;justify-content:center;font-size:.85rem;color:#F59E0B;flex-shrink:0">✦</div>
+          <div style="font-size:.68rem;font-weight:700;color:#F59E0B;letter-spacing:.04em">SUNNY · 实时洞察</div>
+          <div id="homeDots" style="margin-left:auto"><div class="dots"><div class="dot"></div><div class="dot d1"></div><div class="dot d2"></div></div></div>
+        </div>
+        <div id="homeInsightTxt" style="font-size:.8rem;line-height:1.75;color:#E2E8F0"></div>
+      </div>
+
+      <div class="quick-actions">
+        <button class="qa" id="qaSearch"><div class="qa-ico">🔍</div><div class="qa-lbl">出行规划</div></button>
+        <button class="qa" id="qaChat"><div class="qa-ico">🤖</div><div class="qa-lbl">AI对话</div></button>
+        <button class="qa" id="qaHistory"><div class="qa-ico">📋</div><div class="qa-lbl">历史路线</div></button>
+        <button class="qa" id="qaDriverMode"><div class="qa-ico">🚗</div><div class="qa-lbl">司机模式</div></button>
+      </div>
+
+      <div class="sec">平台实时报价 · 5km 参考</div>
+      <div id="homePlatformList" style="display:flex;flex-direction:column;gap:7px;margin-bottom:12px"></div>
+
+      <div class="sec">出行小贴士</div>
+      <div class="card" style="padding:12px" id="homeTip"></div>
+    </div>
+
+    <!-- TRIP PAGE -->
+    <div class="page" id="pageTrip">
+      <div id="tripInput">
+        <div class="card" style="padding:14px;margin-bottom:11px">
+          <div class="sec">行程规划</div>
+          <div class="ctx-chips" id="tripCtxChips"></div>
+
+          <!-- GPS Location -->
+          <div style="display:flex;gap:7px;align-items:center;margin-bottom:11px">
+            <button id="gpsBtn" style="display:flex;align-items:center;gap:6px;background:rgba(20,184,166,.08);border:1px solid rgba(20,184,166,.2);border-radius:10px;padding:8px 12px;color:#14B8A6;font-size:.72rem;font-weight:600;cursor:pointer;flex-shrink:0;-webkit-appearance:none">
+              <span>📡</span><span id="gpsBtnTxt">获取定位</span>
+            </button>
+            <div style="font-size:.65rem;color:rgba(255,255,255,.3)" id="gpsStatus">点击获取当前位置</div>
+          </div>
+
+          <div class="loc-wrap" id="locWrap">
+            <div class="loc-from">
+              <div class="loc-dot" style="background:#10B981;box-shadow:0 0 6px #10B981"></div>
+              <input type="text" class="loc-inp" id="fromInp" placeholder="出发地" autocomplete="off">
+              <div class="sugg" id="fromSugg" style="display:none"></div>
+            </div>
+            <div class="loc-conn"></div>
+            <button class="swap-btn" id="swapBtn">⇅</button>
+            <div class="loc-to">
+              <div class="loc-sq" style="background:#EF4444;box-shadow:0 0 6px #EF4444"></div>
+              <input type="text" class="loc-inp" id="toInp" placeholder="目的地" autocomplete="off">
+              <div class="sugg" id="toSugg" style="display:none"></div>
+            </div>
+          </div>
+
+          <div class="sec" style="margin-top:12px">快速选距</div>
+          <div class="qdist" id="qdistRow"></div>
+          <div class="km-wrap">
+            <span class="km-ico">🛣️</span>
+            <input type="number" class="km-inp" id="kmInp" placeholder="行程距离 km" min="0.5" max="300" step="0.5">
+          </div>
+          <button class="btn-primary" id="searchBtn">✦ AI 智能分析出行方案</button>
+        </div>
+        <div class="hint"><strong>💡 智能过滤：</strong>&gt;15km 隐藏单车 · &lt;2km 优先步行 · &gt;10km 生成接驳换乘方案</div>
+      </div>
+
+      <div id="tripResults" style="display:none">
+        <button class="back-btn" id="tripBackBtn">← 重新规划</button>
+        <div class="ctx-result" id="ctxResult"></div>
+        <div class="card card-amber" style="padding:13px;margin-bottom:11px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:9px">
+            <div style="width:32px;height:32px;border-radius:50%;background:rgba(245,158,11,.14);border:1.5px solid rgba(245,158,11,.3);display:flex;align-items:center;justify-content:center;font-size:.9rem;color:#F59E0B;flex-shrink:0">✦</div>
+            <div style="flex:1"><div style="font-size:.7rem;font-weight:700;color:#F59E0B">SUNNY · AI决策分析</div><div style="font-size:.58rem;color:rgba(255,255,255,.28);margin-top:1px">实时环境 × 城市定价 × 多模态对比</div></div>
+            <div id="rDots"><div class="dots"><div class="dot"></div><div class="dot d1"></div><div class="dot d2"></div></div></div>
+          </div>
+          <div id="rAiTxt" style="font-size:.8rem;line-height:1.75;color:#E2E8F0"></div>
+        </div>
+        <div id="rSavings"></div>
+        <div class="sec">AI 智能排序方案</div>
+        <div class="plan-cards" id="rCards"></div>
+        <div id="rMatrix"></div>
+        <div class="sec">平台优惠</div>
+        <div class="promo-grid" id="rPromos"></div>
+        <div style="padding:9px 12px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:10px;font-size:.62rem;color:rgba(255,255,255,.2);text-align:center">价格为 AI 估算，以平台实际计费为准 · Sunny AI v3.0</div>
+      </div>
+    </div>
+
+    <!-- AI CHAT PAGE -->
+    <div class="page" id="pageChat">
+      <div class="chat-header">
+        <div class="chat-ava">✦</div>
+        <div style="flex:1">
+          <div style="font-weight:700;font-size:.9rem">Sunny AI 出行顾问</div>
+          <div class="chat-status">随时在线 · 实时分析</div>
+        </div>
+        <button id="clearChatBtn" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:5px 10px;font-size:.68rem;color:rgba(255,255,255,.38);cursor:pointer">清空</button>
+      </div>
+      <div class="q-chips" id="qChips"></div>
+      <div id="chatMessages" class="chat-messages"></div>
+      <div class="chat-input-area">
+        <div class="chat-input-row">
+          <textarea class="chat-inp" id="chatInp" placeholder="问我任何出行问题…" rows="1"></textarea>
+          <button class="chat-send" id="chatSendBtn">→</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ANALYTICS PAGE -->
+    <div class="page" id="pageData">
+      <div class="sec">本月出行数据</div>
+      <div class="stat-2grid">
+        <div class="card stat-card">
+          <div class="stat-val" id="dTotalSaved" style="color:#10B981">¥0</div>
+          <div class="stat-lbl">💰 智能节省</div>
+        </div>
+        <div class="card stat-card">
+          <div class="stat-val" id="dTripCount" style="color:#F59E0B">0</div>
+          <div class="stat-lbl">🚗 出行次数</div>
+        </div>
+        <div class="card stat-card">
+          <div class="stat-val" id="dAvgSaved" style="color:#60A5FA">¥0</div>
+          <div class="stat-lbl">📊 平均节省</div>
+        </div>
+        <div class="card stat-card">
+          <div class="stat-val" id="dAiChats" style="color:#A78BFA">0</div>
+          <div class="stat-lbl">🤖 AI 对话</div>
+        </div>
+      </div>
+
+      <div class="sec">近7天出行频率</div>
+      <div class="card chart-wrap" style="padding:14px">
+        <div class="chart-bars" id="weekChart"></div>
+      </div>
+
+      <div class="sec">出行方式偏好</div>
+      <div class="card" style="padding:13px;margin-bottom:12px" id="modeChart"></div>
+
+      <div class="sec">AI 省钱洞察</div>
+      <div id="insightList"></div>
+
+      <button class="btn-ghost" id="clearDataBtn" style="margin-top:6px">🗑 清空本月统计</button>
+    </div>
+
+    <!-- SETTINGS PAGE -->
+    <div class="page" id="pageSettings">
+      <div class="sec">城市与定价</div>
+      <div class="set-section">
+        <div style="font-size:.62rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.28);margin-bottom:7px">当前城市</div>
+        <select class="sel-inp" id="citySelect"></select>
+        <div style="font-size:.62rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.28);margin-bottom:7px;margin-top:5px">AI 引擎</div>
+        <select class="sel-inp" id="aiEngSel">
+          <option value="demo">✨ 本地演示模式（无需 Key）</option>
+          <option value="qwen">🤖 通义千问（推荐）</option>
+          <option value="openai">🧠 OpenAI GPT-4o-mini</option>
+        </select>
+        <div id="keyInputArea" style="display:none">
+          <div style="font-size:.62rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.28);margin-bottom:7px">API Key</div>
+          <input type="password" class="pw-inp" id="apiKeyInp" placeholder="sk-...">
+        </div>
+        <button class="btn-primary" id="saveSettingsBtn" style="margin-top:4px">💾 保存设置</button>
+      </div>
+
+      <div class="sec">收藏路线</div>
+      <div id="favList" style="margin-bottom:10px"></div>
+      <button class="btn-ghost" id="addFavBtn">⭐ 保存当前路线</button>
+
+      <div class="sec" style="margin-top:16px">关于</div>
+      <div class="card" style="padding:13px">
+        <div style="font-size:.78rem;line-height:1.75;color:rgba(255,255,255,.38)">
+          <div style="font-weight:700;color:#F59E0B;margin-bottom:6px">Sunny AI 出行助手 v3.0</div>
+          AI 多模态出行决策引擎 · 城市定价数据库 · 智能路线分析<br>
+          <span style="color:rgba(255,255,255,.22)">© 2026 Zenith Tech · zenithsmart.xin</span><br>
+          <span style="color:rgba(255,255,255,.18);font-size:.65rem">价格为估算值，以平台实际计费为准 · 链接含推广参数</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <div id="nav">
+    <button class="nav-item on" data-page="Home"><div class="nav-ico">🏠</div><div class="nav-lbl">首页</div></button>
+    <button class="nav-item" data-page="Trip"><div class="nav-ico">🔍</div><div class="nav-lbl">出行</div></button>
+    <button class="nav-item" data-page="Chat"><div class="nav-ico">🤖</div><div class="nav-lbl">AI助手</div><div class="nav-dot" id="chatDot"></div></button>
+    <button class="nav-item" data-page="Data"><div class="nav-ico">📊</div><div class="nav-lbl">数据</div></button>
+    <button class="nav-item" data-page="Settings"><div class="nav-ico">⚙️</div><div class="nav-lbl">设置</div></button>
+  </div>
+</div>
+
+<!-- DRAWERS -->
+<div id="drawer" style="display:none"></div>
+
+<script>
+// ===================== DATA =====================
+var CITY_DB={
+  '上海':{base:14,pk:2.5,pm:.5,hb:10,hk:1.2,sp:1.30,sr:1.22,vpk:20,vnm:30,mb:3,mc:14,bp:2,hm:true,t:1},
+  '北京':{base:13,pk:2.3,pm:.5,hb:9,hk:1.1,sp:1.35,sr:1.25,vpk:18,vnm:28,mb:3,mc:10,bp:2,hm:true,t:1},
+  '深圳':{base:11,pk:2.2,pm:.45,hb:8.5,hk:1.05,sp:1.28,sr:1.18,vpk:20,vnm:30,mb:2,mc:12,bp:2,hm:true,t:1},
+  '广州':{base:10,pk:2.1,pm:.4,hb:8,hk:1,sp:1.28,sr:1.20,vpk:22,vnm:32,mb:2,mc:10,bp:2,hm:true,t:1},
+  '杭州':{base:11,pk:2.1,pm:.4,hb:8,hk:1,sp:1.25,sr:1.18,vpk:22,vnm:32,mb:2,mc:8,bp:1.5,hm:true,t:2},
+  '成都':{base:9,pk:1.9,pm:.38,hb:7,hk:.9,sp:1.20,sr:1.15,vpk:23,vnm:33,mb:2,mc:8,bp:1.5,hm:true,t:2},
+  '重庆':{base:9,pk:1.85,pm:.38,hb:7,hk:.88,sp:1.20,sr:1.12,vpk:22,vnm:30,mb:2,mc:8,bp:2,hm:true,t:2},
+  '武汉':{base:9,pk:1.9,pm:.38,hb:7,hk:.9,sp:1.20,sr:1.15,vpk:23,vnm:33,mb:2,mc:8,bp:1.5,hm:true,t:2},
+  '南京':{base:10,pk:2,pm:.4,hb:7.5,hk:.95,sp:1.22,sr:1.15,vpk:24,vnm:34,mb:2,mc:8,bp:1.5,hm:true,t:2},
+  '西安':{base:8,pk:1.8,pm:.35,hb:6.5,hk:.85,sp:1.18,sr:1.12,vpk:25,vnm:36,mb:2,mc:6,bp:1,hm:true,t:3},
+  '长沙':{base:8,pk:1.75,pm:.35,hb:6,hk:.82,sp:1.18,sr:1.10,vpk:26,vnm:36,mb:2,mc:6,bp:1,hm:true,t:3},
+  '郑州':{base:8,pk:1.8,pm:.35,hb:6.5,hk:.85,sp:1.18,sr:1.10,vpk:25,vnm:35,mb:2,mc:6,bp:1,hm:true,t:3},
+  '天津':{base:10,pk:2,pm:.4,hb:7.5,hk:.95,sp:1.22,sr:1.15,vpk:24,vnm:34,mb:2,mc:8,bp:1.5,hm:true,t:2},
+  '苏州':{base:10,pk:2,pm:.4,hb:7.5,hk:.95,sp:1.22,sr:1.15,vpk:24,vnm:34,mb:2,mc:8,bp:1.5,hm:true,t:2},
+  '合肥':{base:8,pk:1.8,pm:.35,hb:6.5,hk:.85,sp:1.18,sr:1.10,vpk:25,vnm:35,mb:2,mc:6,bp:1,hm:true,t:3},
+  '宁波':{base:9.5,pk:1.95,pm:.38,hb:7,hk:.9,sp:1.20,sr:1.12,vpk:24,vnm:34,mb:2,mc:8,bp:1.5,hm:true,t:2},
+  '厦门':{base:9,pk:1.9,pm:.38,hb:7,hk:.9,sp:1.20,sr:1.15,vpk:24,vnm:34,mb:2,mc:6,bp:1.5,hm:true,t:2},
 };
-
-// ========== DATA ==========
-const CITY_DB = {
-  '上海':{base:14,perKm:2.5,perMin:.5,hitchBase:10,hitchKm:1.2,surge_peak:1.30,surge_rain:1.22,spd_pk:20,spd_nm:30,metroBase:3,metroCap:14,busPrice:2,hasMetro:true,tier:1},
-  '北京':{base:13,perKm:2.3,perMin:.5,hitchBase:9,hitchKm:1.1,surge_peak:1.35,surge_rain:1.25,spd_pk:18,spd_nm:28,metroBase:3,metroCap:10,busPrice:2,hasMetro:true,tier:1},
-  '深圳':{base:11,perKm:2.2,perMin:.45,hitchBase:8.5,hitchKm:1.05,surge_peak:1.28,surge_rain:1.18,spd_pk:20,spd_nm:30,metroBase:2,metroCap:12,busPrice:2,hasMetro:true,tier:1},
-  '广州':{base:10,perKm:2.1,perMin:.4,hitchBase:8,hitchKm:1,surge_peak:1.28,surge_rain:1.20,spd_pk:22,spd_nm:32,metroBase:2,metroCap:10,busPrice:2,hasMetro:true,tier:1},
-  '杭州':{base:11,perKm:2.1,perMin:.4,hitchBase:8,hitchKm:1,surge_peak:1.25,surge_rain:1.18,spd_pk:22,spd_nm:32,metroBase:2,metroCap:8,busPrice:1.5,hasMetro:true,tier:2},
-  '成都':{base:9,perKm:1.9,perMin:.38,hitchBase:7,hitchKm:.9,surge_peak:1.20,surge_rain:1.15,spd_pk:23,spd_nm:33,metroBase:2,metroCap:8,busPrice:1.5,hasMetro:true,tier:2},
-  '重庆':{base:9,perKm:1.85,perMin:.38,hitchBase:7,hitchKm:.88,surge_peak:1.20,surge_rain:1.12,spd_pk:22,spd_nm:30,metroBase:2,metroCap:8,busPrice:2,hasMetro:true,tier:2},
-  '武汉':{base:9,perKm:1.9,perMin:.38,hitchBase:7,hitchKm:.9,surge_peak:1.20,surge_rain:1.15,spd_pk:23,spd_nm:33,metroBase:2,metroCap:8,busPrice:1.5,hasMetro:true,tier:2},
-  '南京':{base:10,perKm:2,perMin:.4,hitchBase:7.5,hitchKm:.95,surge_peak:1.22,surge_rain:1.15,spd_pk:24,spd_nm:34,metroBase:2,metroCap:8,busPrice:1.5,hasMetro:true,tier:2},
-  '西安':{base:8,perKm:1.8,perMin:.35,hitchBase:6.5,hitchKm:.85,surge_peak:1.18,surge_rain:1.12,spd_pk:25,spd_nm:36,metroBase:2,metroCap:6,busPrice:1,hasMetro:true,tier:3},
-  '长沙':{base:8,perKm:1.75,perMin:.35,hitchBase:6,hitchKm:.82,surge_peak:1.18,surge_rain:1.10,spd_pk:26,spd_nm:36,metroBase:2,metroCap:6,busPrice:1,hasMetro:true,tier:3},
-  '郑州':{base:8,perKm:1.8,perMin:.35,hitchBase:6.5,hitchKm:.85,surge_peak:1.18,surge_rain:1.10,spd_pk:25,spd_nm:35,metroBase:2,metroCap:6,busPrice:1,hasMetro:true,tier:3},
-  '天津':{base:10,perKm:2,perMin:.4,hitchBase:7.5,hitchKm:.95,surge_peak:1.22,surge_rain:1.15,spd_pk:24,spd_nm:34,metroBase:2,metroCap:8,busPrice:1.5,hasMetro:true,tier:2},
-  '苏州':{base:10,perKm:2,perMin:.4,hitchBase:7.5,hitchKm:.95,surge_peak:1.22,surge_rain:1.15,spd_pk:24,spd_nm:34,metroBase:2,metroCap:8,busPrice:1.5,hasMetro:true,tier:2},
-};
-const DEF_CITY = {base:9,perKm:1.9,perMin:.38,hitchBase:7,hitchKm:.9,surge_peak:1.20,surge_rain:1.15,spd_pk:25,spd_nm:35,metroBase:2,metroCap:8,busPrice:1.5,hasMetro:true,tier:3};
-
-const PLATFORMS = [
-  {id:'hua',name:'花小猪',icon:'🐷',factor:.87,coupon:'首单-¥8',url:'https://x.huaxz.cn/R2WQ955?source_id=458986jutuike123456&ref_from=dunion',color:'#EC4899'},
-  {id:'tongcheng',name:'同程出行',icon:'🚌',factor:.93,coupon:'最高减¥15',url:'https://wx.17u.cn/carfe/app/slCoupons?mark=t6255690',color:'#3B82F6'},
-  {id:'didi',name:'滴滴快车',icon:'🚖',factor:1.00,coupon:'新客立减¥10',url:'https://v.didi.cn/kwoQAa7?source_id=458986jutuike123456&ref_from=dunion',color:'#F59E0B'},
-  {id:'t3',name:'T3出行',icon:'🚗',factor:.95,coupon:'新人享优惠',url:'https://t3go.cn',color:'#14B8A6'},
-  {id:'gaode',name:'高德打车',icon:'🗺️',factor:.97,coupon:'免佣金补贴',url:'https://www.amap.com',color:'#6366F1'},
+var DEF={base:9,pk:1.9,pm:.38,hb:7,hk:.9,sp:1.20,sr:1.15,vpk:25,vnm:35,mb:2,mc:8,bp:1.5,hm:true,t:3};
+var PLATS=[
+  {id:'hua',name:'花小猪',icon:'🐷',fac:.87,coupon:'首单-¥8',url:'https://x.huaxz.cn/R2WQ955?source_id=458986jutuike123456&ref_from=dunion',col:'#EC4899'},
+  {id:'tongcheng',name:'同程出行',icon:'🚌',fac:.93,coupon:'最高减¥15',url:'https://wx.17u.cn/carfe/app/slCoupons?mark=t6255690',col:'#3B82F6'},
+  {id:'didi',name:'滴滴快车',icon:'🚖',fac:1.00,coupon:'新客立减¥10',url:'https://v.didi.cn/kwoQAa7?source_id=458986jutuike123456&ref_from=dunion',col:'#F59E0B'},
+  {id:'t3',name:'T3出行',icon:'🚗',fac:.95,coupon:'新人享优惠',url:'https://t3go.cn',col:'#14B8A6'},
+  {id:'gaode',name:'高德打车',icon:'🗺️',fac:.97,coupon:'免佣金补贴',url:'https://www.amap.com',col:'#6366F1'},
 ];
+var PROMOS=[
+  {ico:'🎁',name:'滴滴新用户',sub:'首单立减',url:'https://vv.didi.cn/86zJERv?source_id=458986jutuike123456&ref_from=dunion',col:'#F59E0B'},
+  {ico:'🐷',name:'花小猪首单',sub:'直减¥8',url:'https://x.huaxz.cn/R2WQ955?source_id=458986jutuike123456&ref_from=dunion',col:'#EC4899'},
+  {ico:'🤵',name:'滴滴代驾',sub:'新客特惠',url:'https://v.didi.cn/qgJmkGz?source_id=458986jutuike123456&ref_from=dunion',col:'#A78BFA'},
+  {ico:'🏨',name:'美团酒店',sub:'出行住宿',url:'https://h5cms.jutuike.cn/#/pages/toMiniProgram/toMiniProgram?&act_id=10&sid=123456&code=SmsOZUlF',col:'#10B981'},
+];
+var PLACES=['首都国际机场','大兴国际机场','虹桥机场','浦东国际机场','南京东路','陆家嘴','人民广场','徐家汇','天安门广场','三里屯','深圳北站','广州南站','西湖','天府广场','解放碑','武汉天河机场','南京南站','西安钟楼','公司','家','地铁站','高铁站','购物中心','医院','大学城','机场'];
+var TIPS=[
+  '🌧️ 雨天打车需求暴增，顺风车是锁定固定价的最优解，比网约车省 15-30%。',
+  '⏰ 高峰期结束后 15 分钟是叫车黄金窗口，价格骤降但供给充足。',
+  '🚇 距离 5-15km 且不赶时间？地铁比打车省 60%，且准点率更高。',
+  '🐷 花小猪新用户首单直减 ¥8，叠加平台本身低价，是一线城市短途首选。',
+  '🔀 长途出行可考虑"打车+地铁"接驳方案，通常比全程打车省 ¥10-30。',
+  '🌙 深夜 22 点后打车溢价降低，但等待时间变长，提前 10 分钟下单更稳妥。',
+  '📊 同程出行在非高峰期经常有区域补贴，价格有时比滴滴便宜 10-15%。',
+  '🚲 3km 以内晴天骑共享单车，¥1.5 搞定且运动健身，打车是浪费时间的奢侈。',
+];
+var QWEN_KEY='sk-cfb5319ee5a24f7b9361608b7615a79b';
+var QWEN_API='https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions';
 
-const WEATHER_META = {
-  sunny:{label:'晴天',icon:'☀️'},
-  rain:{label:'小雨',icon:'🌧️'},
-  storm:{label:'暴雨',icon:'⛈️'},
+// ===================== STATE =====================
+var S={
+  city:ls('sc')||'上海',
+  weather:'sunny', // sunny/rain/storm
+  timeType:'normal', // normal/peak/night
+  aiEngine:ls('ae')||'demo',
+  apiKey:ls('ak')||'',
+  totalSaved:parseFloat(ls('ss')||'0'),
+  tripCount:parseInt(ls('tc')||'0'),
+  aiChats:parseInt(ls('ac')||'0'),
+  currentPlans:[],
+  currentKm:0,
+  currentFrom:'',
+  currentTo:'',
+  locCity:'',
+  chatHistory:[],
+  weekData:JSON.parse(ls('wd')||'[0,0,0,0,0,0,0]'),
+  modeUsage:JSON.parse(ls('mu')||'{"ridehail":0,"hitch":0,"transit":0,"active":0,"combo":0}'),
 };
-const TIME_META = {
-  normal:{label:'平峰',icon:'🟢'},
-  peak:{label:'高峰',icon:'🔴'},
-  night:{label:'深夜',icon:'🌙'},
-};
-const PLACES = ['首都国际机场','大兴国际机场','虹桥机场','浦东国际机场','南京东路','陆家嘴','人民广场','徐家汇','天安门','三里屯','深圳北站','广州南站','西湖','天府广场','解放碑','公司','家','高铁站','地铁站','购物中心','医院','大学城'];
+function ls(k){try{return localStorage.getItem(k);}catch(e){return null;}}
+function sv(k,v){try{localStorage.setItem(k,v);}catch(e){}}
+function C(){return CITY_DB[S.city]||DEF;}
+function r1(v){return Math.round(v*10)/10;}
+function r0(v){return Math.round(v);}
 
-// ========== ENGINE ==========
-function getSurge(cd, weather, time) {
-  let m = 1;
-  if (weather === 'rain') m *= cd.surge_rain;
-  if (weather === 'storm') m *= cd.surge_rain * 1.16;
-  if (time === 'peak') m *= cd.surge_peak;
-  if (time === 'night') m *= 0.92;
+// ===================== SPLASH =====================
+var SM=['加载城市定价数据库…','初始化 AI 决策引擎…','获取实时环境数据…','多模态出行分析就绪 ✓'];
+var si=0;var stv=setInterval(function(){if(++si<SM.length)document.getElementById('splashTxt').textContent=SM[si];else clearInterval(stv);},480);
+setTimeout(function(){
+  var sp=document.getElementById('splash');sp.classList.add('out');
+  setTimeout(function(){sp.style.display='none';bootApp();},620);
+},2400);
+
+// ===================== BOOT =====================
+function bootApp(){
+  document.getElementById('shell').classList.add('on');
+  initClock();
+  detectTimeContext();
+  buildUI();
+  loadSettings();
+  renderHome();
+  renderAnalytics();
+  setupNav();
+  setupTrip();
+  setupChat();
+  setupSettings();
+  startAutoRefresh();
+  setTimeout(getLocation,600);
+  initWeather();
+}
+
+// CLOCK
+function initClock(){
+  function tick(){
+    var d=new Date();
+    var h=d.getHours(),m=d.getMinutes();
+    document.getElementById('sbTime').textContent=(h<10?'0':'')+h+':'+(m<10?'0':'')+m;
+  }
+  tick();setInterval(tick,30000);
+}
+
+// TIME CONTEXT
+function detectTimeContext(){
+  var h=new Date().getHours();
+  if((h>=7&&h<9)||(h>=17&&h<19)){S.timeType='peak';}
+  else if(h>=22||h<6){S.timeType='night';}
+  else{S.timeType='normal';}
+}
+
+// WEATHER (simulated)
+function initWeather(){
+  var d=new Date().getDate();
+  var r=d%5;
+  if(r<3)S.weather='sunny';
+  else if(r<4)S.weather='rain';
+  else S.weather='storm';
+}
+
+function getSurge(){
+  var c=C(),m=1;
+  if(S.weather==='rain')m*=c.sr;
+  if(S.weather==='storm')m*=c.sr*1.16;
+  if(S.timeType==='peak')m*=c.sp;
+  if(S.timeType==='night')m*=0.92;
   return m;
 }
 
-function estMin(km, cd, time) {
-  const spd = time === 'peak' ? cd.spd_pk : time === 'night' ? cd.spd_nm * 1.15 : cd.spd_nm;
-  return Math.max(3, Math.round(km / spd * 60));
+// ===================== HOME =====================
+function renderHome(){
+  var c=C(),h=new Date().getHours(),surge=getSurge();
+  // Greeting
+  var gr=h<12?'早安 ☀️':h<18?'下午好 🌤️':'晚上好 🌙';
+  document.getElementById('homeGreeting').textContent=gr;
+  // Peak badge
+  var pb=document.getElementById('peakBadge');
+  if(S.timeType==='peak'){pb.className='peak-badge peak-on';pb.textContent='🔴 高峰时段';}
+  else if(S.timeType==='night'){pb.className='peak-badge peak-warn';pb.textContent='🌙 深夜时段';}
+  else{pb.className='peak-badge peak-off';pb.textContent='🟢 平峰时段';}
+  // Weather
+  var wIco={'sunny':'☀️','rain':'🌧️','storm':'⛈️'}[S.weather];
+  var wTxt={'sunny':'晴天 · 无溢价','rain':'小雨 · 溢价×'+c.sr,'storm':'暴雨 · 溢价×'+(c.sr*1.16).toFixed(2)}[S.weather];
+  document.getElementById('homeWeatherIco').textContent=wIco;
+  document.getElementById('homeWeatherTxt').textContent=wTxt;
+  var pDesc=S.timeType==='peak'?'高峰溢价×'+c.sp+'，建议等峰或选顺风车固定价':S.timeType==='night'?'深夜时段享受0.92折扣，适合出行':'现在叫车价格正常，是出行的好时机';
+  document.getElementById('homePeakDesc').textContent=pDesc;
+  // Traffic bar (time-based simulation)
+  var tb=document.getElementById('trafficBar');tb.innerHTML='';
+  var trafficLevel=S.timeType==='peak'?0.75:S.timeType==='night'?0.15:0.3+(Math.random()*0.2);
+  var segs=16;
+  for(var i=0;i<segs;i++){
+    var pct=i/segs;
+    var col=pct<0.33?'#10B981':pct<0.66?'#F59E0B':'#EF4444';
+    var op=pct<=trafficLevel?1:0.1;
+    var d=document.createElement('div');d.className='tb-seg';
+    d.style.cssText='background:'+col+';opacity:'+op+';height:6px';
+    tb.appendChild(d);
+  }
+  var tLabels=['畅通','轻度拥堵','中度拥堵','重度拥堵'];
+  document.getElementById('trafficLabel').textContent=tLabels[Math.min(Math.floor(trafficLevel/0.26),3)];
+  // Ref 5km price
+  var bMin=Math.max(3,Math.round(5/(S.timeType==='peak'?c.vpk:c.vnm)*60));
+  var ref5=r1((c.base+5*c.pk+bMin*c.pm)*surge);
+  document.getElementById('statRef5').textContent='¥'+ref5;
+  document.getElementById('statSurge').textContent='×'+surge.toFixed(2);
+  var waitT=S.timeType==='peak'?'5-8min':S.timeType==='night'?'6-12min':'2-5min';
+  document.getElementById('statWait').textContent=waitT;
+  // Price ticker
+  buildTicker();
+  // Platform list
+  buildHomePlatforms();
+  // AI insight
+  buildHomeInsight();
+  // Tip
+  var tip=TIPS[new Date().getDay()%TIPS.length];
+  document.getElementById('homeTip').innerHTML='<div style="font-size:.78rem;line-height:1.72;color:rgba(255,255,255,.55)">'+tip+'</div>';
 }
 
-function r1(v) { return Math.round(v * 10) / 10; }
-
-function generatePlans(km, cd, weather, time) {
-  if (!km || km < 0.5) return [];
-  const surge = getSurge(cd, weather, time);
-  const baseMin = estMin(km, cd, time);
-  const basePrice = (cd.base + km * cd.perKm + baseMin * cd.perMin) * surge;
-  const plans = [];
-
-  if (km <= 2) {
-    plans.push({
-      id:'walk', type:'active', name:'步行', icon:'🚶', color:'#34D399',
-      price:0, minutes:Math.round(km/0.083), waitMin:0,
-      coupon:'免费 · 零碳出行', url:null,
-      breakdown:[{label:'步行速度',value:'约5km/h'},{label:'消耗热量',value:'约'+Math.round(km*68)+'千卡'}],
-    });
-  }
-
-  if (km <= 15) {
-    const bikeMin = Math.round(km / 0.2);
-    const blocks = Math.ceil(bikeMin / 30);
-    plans.push({
-      id:'bike', type:'active', name:'共享单车', icon:'🚲', color:'#FCD34D',
-      price: r1(blocks * 1.5), minutes: bikeMin, waitMin:1,
-      coupon:'¥1.5/30min · 最省钱', url:null,
-      breakdown:[{label:'骑行时间',value:bikeMin+'min'},{label:'计费',value:'¥1.5/30min x '+blocks+'块'}],
-    });
-  }
-
-  if (km <= 25) {
-    const busMin = Math.round(km / 0.22 + 8);
-    const segs = km <= 5 ? 1 : km <= 15 ? 2 : 3;
-    plans.push({
-      id:'bus', type:'transit', name:'公交车', icon:'🚌', color:'#A78BFA',
-      price: r1(segs * cd.busPrice), minutes: busMin, waitMin:5,
-      coupon:'固定票价 · 无溢价', url:null,
-      breakdown:[{label:'单段票价',value:'¥'+cd.busPrice},{label:'乘坐段数',value:segs+'段'}],
-    });
-  }
-
-  if (cd.hasMetro && km <= 45) {
-    const mPrice = Math.min(Math.round(cd.metroBase + km * 0.1), cd.metroCap);
-    const mMin = Math.round(km / 0.65 + 11);
-    plans.push({
-      id:'metro', type:'transit', name:'地铁', icon:'🚇', color:'#60A5FA',
-      price:mPrice, minutes:mMin, waitMin:3,
-      coupon:'固定票价 · 准时可靠', url:null,
-      breakdown:[{label:'起步价',value:'¥'+cd.metroBase},{label:'封顶价',value:'¥'+cd.metroCap},{label:'预计时长',value:mMin+'min'}],
-    });
-  }
-
-  if (km >= 3) {
-    const hitchPrice = r1(cd.hitchBase + km * cd.hitchKm);
-    const hitchWait = Math.round(km / 7 + 3);
-    plans.push({
-      id:'hitch', type:'hitch', name:'顺风车', icon:'🟡', color:'#10B981',
-      price:hitchPrice, minutes:baseMin + hitchWait, waitMin:hitchWait,
-      coupon:'固定价 · 不随天气涨价', url:'https://v.didi.cn/3Zajzk5?source_id=458986jutuike123456&ref_from=dunion',
-      breakdown:[
-        {label:'起步价',value:'¥'+cd.hitchBase},
-        {label:'里程费',value:'¥'+r1(km*cd.hitchKm)},
-        {label:'动态系数',value:'×1.00（固定不变）'},
-      ],
-    });
-  }
-
-  PLATFORMS.forEach(p => {
-    const noise = 0.96 + Math.random() * 0.07;
-    const price = r1(basePrice * p.factor * noise);
-    const wait = Math.round(2 + Math.random() * 4);
-    plans.push({
-      id:p.id, type:'ridehail', name:p.name, icon:p.icon, color:p.color,
-      price, minutes:baseMin + wait, waitMin:wait,
-      coupon:p.coupon, url:p.url,
-      breakdown:[
-        {label:'起步价',value:'¥'+cd.base.toFixed(1)},
-        {label:'里程费',value:'¥'+r1(km*cd.perKm)},
-        {label:'时长费',value:'¥'+r1(baseMin*cd.perMin)},
-        {label:'溢价系数',value:'×'+surge.toFixed(2)},
-        ...(p.factor < 1 ? [{label:'平台折扣',value:'×'+p.factor}] : []),
-      ],
-    });
+function buildTicker(){
+  var c=C(),surge=getSurge();
+  var items=PLATS.map(function(p){
+    var bm=Math.max(3,Math.round(8/(S.timeType==='peak'?c.vpk:c.vnm)*60));
+    var price=r1((c.base+8*c.pk+bm*c.pm)*surge*p.fac*(0.97+Math.random()*0.06));
+    return '<span>'+p.icon+' '+p.name+'&nbsp;<strong style="color:'+p.col+'">¥'+price+'</strong>&nbsp;/8km</span>';
   });
+  items.push('<span>🟡 顺风车&nbsp;<strong style="color:#10B981">¥'+r1(c.hb+8*c.hk)+'</strong>&nbsp;/8km（固定价）</span>');
+  items.push('<span>🚇 地铁&nbsp;<strong style="color:#60A5FA">¥'+Math.min(r0(c.mb+8*0.1),c.mc)+'</strong>&nbsp;/8km</span>');
+  document.getElementById('priceTicker').innerHTML=items.join('');
+}
 
-  if (cd.hasMetro && km > 10) {
-    const txKm = Math.min(5, r1(km * 0.28));
-    const txMin = estMin(txKm, cd, time);
-    const txPrice = r1((cd.base + txKm * cd.perKm + txMin * cd.perMin) * surge);
-    const mKm = km - txKm - 0.8;
-    const mPrice = Math.min(Math.round(cd.metroBase + mKm * 0.1), cd.metroCap);
-    const mMin = Math.round(mKm / 0.65 + 8);
-    const comboTotal = r1(txPrice + mPrice);
-    const comboMin = txMin + 4 + mMin;
-    const cheapRide = r1(basePrice * 0.87);
+function buildHomePlatforms(){
+  var c=C(),surge=getSurge();
+  var list=document.getElementById('homePlatformList');
+  list.innerHTML='';
+  var ref=r1((c.base+5*c.pk+Math.max(3,Math.round(5/(S.timeType==='peak'?c.vpk:c.vnm)*60))*c.pm)*surge);
+  PLATS.forEach(function(p){
+    var price=r1(ref*p.fac*(0.97+Math.random()*0.05));
+    var d=document.createElement('div');
+    d.style.cssText='display:flex;align-items:center;gap:9px;padding:9px 12px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.055);border-radius:11px;cursor:pointer';
+    d.innerHTML='<span style="font-size:1.1rem">'+p.icon+'</span>'
+      +'<div style="flex:1"><div style="font-size:.8rem;font-weight:600;color:#F1F5F9">'+p.name+'</div><div style="font-size:.62rem;color:rgba(255,255,255,.35);margin-top:1px">'+p.coupon+'</div></div>'
+      +'<div style="text-align:right"><div style="font-size:1rem;font-weight:700;color:'+p.col+';font-variant-numeric:tabular-nums">¥'+price+'</div><div style="font-size:.58rem;color:rgba(255,255,255,.28)">5km 参考</div></div>'
+      +'<div style="font-size:.7rem;color:rgba(255,255,255,.2)">→</div>';
+    d.addEventListener('click',function(){window.open(p.url,'_blank');});
+    list.appendChild(d);
+  });
+}
 
-    if (comboTotal < cheapRide * 0.83) {
-      const saving = r1(cheapRide - comboTotal);
-      plans.push({
-        id:'combo', type:'combo', name:'接驳换乘', icon:'🔀', color:'#14B8A6',
-        price:comboTotal, minutes:comboMin, waitMin:3,
-        coupon:`比纯打车省¥${saving}`, url:null, isCombo:true,
-        comboSteps:[
-          {icon:'🚖', label:`打车${txKm}km至地铁口`, duration:txMin, price:txPrice},
-          {icon:'🚶', label:'步行进站', duration:4, price:0},
-          {icon:'🚇', label:`地铁${r1(mKm)}km直达`, duration:mMin, price:mPrice},
-        ],
-        breakdown:[
-          {label:'网约车段',value:`¥${txPrice} · ${txMin}min`},
-          {label:'地铁段',value:`¥${mPrice} · ${mMin}min`},
-          {label:'合计费用',value:`¥${comboTotal}`},
-          {label:'合计时间',value:`${comboMin}min`},
-        ],
-      });
+function buildHomeInsight(){
+  var c=C(),surge=getSurge();
+  var ref5=r1((c.base+5*c.pk+Math.max(3,Math.round(5/(S.timeType==='peak'?c.vpk:c.vnm)*60))*c.pm)*surge);
+  var hitch5=r1(c.hb+5*c.hk);
+  var metro5=Math.min(r0(c.mb+5*0.1),c.mc);
+  var insights=[
+    S.timeType==='peak'?'⚡ 现在是'+S.city+'高峰期，路面溢价×'+c.sp+'。网约车参考价¥'+ref5+'（5km），顺风车固定价¥'+hitch5+'可省¥'+r1(ref5-hitch5)+'——若时间允许，等顺风是最优解。':
+    S.timeType==='night'?'🌙 深夜时段，打车溢价降至×0.92，比白天平峰更便宜。但供给减少，等待时间约 6-12 分钟，建议提前下单。':
+    '✅ 当前'+S.city+'出行环境良好，各平台正常定价。5km 网约车约¥'+ref5+'，地铁约¥'+metro5+'。',
+    S.weather==='rain'?'🌧️ 雨天溢价×'+c.sr+'已生效，打车贵且等待长。顺风车固定价是雨天最优选择，完全不受天气定价影响。':
+    S.weather==='storm'?'⛈️ 暴雨天气溢价已达×'+(c.sr*1.16).toFixed(2)+'，网约车大幅涨价且很难叫到。强烈建议候车区等候或选顺风车。':
+    '📊 今日晴天，所有平台无天气溢价。是比价出行的黄金时段，顺风车 vs 网约车差价¥'+r1(ref5*1.0-hitch5)+'。',
+  ];
+  document.getElementById('homeDots').style.display='none';
+  typeText('homeInsightTxt',insights[0]+(insights[1]?'\n\n'+insights[1]:''));
+}
+
+function buildUI(){
+  // City select
+  var sel=document.getElementById('citySelect');
+  if(sel){Object.keys(CITY_DB).forEach(function(c){var o=document.createElement('option');o.value=c;o.textContent=c;if(c===S.city)o.selected=true;sel.appendChild(o);});}
+  // Quick dist
+  var qd=document.getElementById('qdistRow');
+  if(qd){[2,5,10,20,35].forEach(function(d){var b=document.createElement('button');b.className='qd';b.textContent=d+'km';b.addEventListener('click',function(){document.getElementById('kmInp').value=d;});qd.appendChild(b);});
+    var cu=document.createElement('button');cu.className='qd';cu.textContent='自定义';cu.addEventListener('click',function(){var v=prompt('输入距离（km）：');if(v&&!isNaN(parseFloat(v))&&parseFloat(v)>0)document.getElementById('kmInp').value=parseFloat(v);});qd.appendChild(cu);}
+  // Q chips
+  var qChips=document.getElementById('qChips');
+  if(qChips){['现在怎么出行最省？','高峰期有什么建议？','如何叫到最便宜的车？','雨天出行攻略','顺风车 vs 网约车','地铁还是打车？'].forEach(function(q){var b=document.createElement('button');b.className='q-chip';b.textContent=q;b.addEventListener('click',function(){sendChat(q);});qChips.appendChild(b);});}
+  // Trip ctx chips
+  renderTripChips();
+  // QA buttons
+  var qa=document.getElementById('qaSearch');if(qa)qa.addEventListener('click',function(){switchPage('Trip');});
+  var qb=document.getElementById('qaChat');if(qb)qb.addEventListener('click',function(){switchPage('Chat');});
+  var qc=document.getElementById('qaHistory');if(qc)qc.addEventListener('click',function(){openHistoryDrawer();});
+  var qd2=document.getElementById('qaDriverMode');if(qd2)qd2.addEventListener('click',function(){openDriverDrawer();});
+}
+
+// ===================== NAV =====================
+function setupNav(){
+  document.querySelectorAll('.nav-item').forEach(function(btn){
+    btn.addEventListener('click',function(){switchPage(btn.dataset.page);});
+  });
+}
+function switchPage(name){
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('.nav-item').forEach(function(b){b.classList.remove('on');});
+  var page=document.getElementById('page'+name);
+  if(page)page.classList.add('active');
+  var navBtn=document.querySelector('[data-page="'+name+'"]');
+  if(navBtn)navBtn.classList.add('on');
+  if(name==='Data')renderAnalytics();
+  if(name==='Settings')renderFavs();
+}
+
+// ===================== TRIP =====================
+function renderTripChips(){
+  var ch=document.getElementById('tripCtxChips');
+  if(!ch)return;
+  var wArr=['sunny','rain','storm'],tArr=['normal','peak','night'];
+  var wMeta={sunny:{l:'晴天',i:'☀️'},rain:{l:'小雨',i:'🌧️'},storm:{l:'暴雨',i:'⛈️'}};
+  var tMeta={normal:{l:'平峰',i:'🟢'},peak:{l:'高峰',i:'🔴'},night:{l:'深夜',i:'🌙'}};
+  ch.innerHTML='';
+  var bw=document.createElement('button');bw.className='chip on';bw.id='wChip';bw.textContent=wMeta[S.weather].i+' '+wMeta[S.weather].l;
+  bw.addEventListener('click',function(){S.weather=wArr[(wArr.indexOf(S.weather)+1)%3];bw.textContent=wMeta[S.weather].i+' '+wMeta[S.weather].l;renderHome();});
+  var bt=document.createElement('button');bt.className='chip on';bt.id='tChip';bt.textContent=tMeta[S.timeType].i+' '+tMeta[S.timeType].l;
+  bt.addEventListener('click',function(){S.timeType=tArr[(tArr.indexOf(S.timeType)+1)%3];bt.textContent=tMeta[S.timeType].i+' '+tMeta[S.timeType].l;renderHome();});
+  ch.appendChild(bw);ch.appendChild(bt);
+}
+
+function setupTrip(){
+  document.getElementById('searchBtn').addEventListener('click',doSearch);
+  document.getElementById('tripBackBtn').addEventListener('click',function(){document.getElementById('tripInput').style.display='block';document.getElementById('tripResults').style.display='none';});
+  document.getElementById('swapBtn').addEventListener('click',function(){var f=document.getElementById('fromInp'),t=document.getElementById('toInp'),tmp=f.value;f.value=t.value;t.value=tmp;});
+  document.getElementById('gpsBtn').addEventListener('click',doGPS);
+  setupLocInp('fromInp','fromSugg');
+  setupLocInp('toInp','toSugg');
+}
+
+function setupLocInp(inpId,suggId){
+  var inp=document.getElementById(inpId),box=document.getElementById(suggId),tmr=null;
+  inp.addEventListener('input',function(){clearTimeout(tmr);tmr=setTimeout(function(){showSugg(inp,box);},80);});
+  inp.addEventListener('focus',function(){showSugg(inp,box);});
+  inp.addEventListener('blur',function(){setTimeout(function(){box.style.display='none';},220);});
+}
+function showSugg(inp,box){
+  var v=inp.value.trim().toLowerCase();
+  var list=v?PLACES.filter(function(p){return p.toLowerCase().indexOf(v)>=0;}).slice(0,6):PLACES.slice(0,6);
+  if(!list.length){box.style.display='none';return;}
+  box.innerHTML=list.map(function(p){return '<div class="sugg-i">📍 '+p+'</div>';}).join('');
+  box.querySelectorAll('.sugg-i').forEach(function(el,i){
+    function pick(){inp.value=list[i];box.style.display='none';}
+    el.addEventListener('mousedown',function(e){e.preventDefault();pick();});
+    el.addEventListener('touchstart',function(e){e.preventDefault();pick();},{passive:false});
+  });
+  box.style.display='block';
+}
+
+function doGPS(){
+  document.getElementById('gpsBtnTxt').textContent='定位中…';
+  document.getElementById('gpsStatus').textContent='正在获取 GPS 位置…';
+  if(!navigator.geolocation){document.getElementById('gpsStatus').textContent='设备不支持 GPS';document.getElementById('gpsBtnTxt').textContent='获取定位';return;}
+  navigator.geolocation.getCurrentPosition(function(pos){
+    document.getElementById('gpsBtnTxt').textContent='已定位';
+    document.getElementById('gpsStatus').textContent='📡 GPS ±'+Math.round(pos.coords.accuracy)+'m · '+S.city;
+    document.getElementById('fromInp').value='当前位置 ('+S.city+')';
+  },function(){
+    document.getElementById('gpsBtnTxt').textContent='获取定位';
+    document.getElementById('gpsStatus').textContent='定位失败，请手动输入';
+  },{timeout:8000,enableHighAccuracy:true});
+}
+
+function getLocation(){
+  fetch('https://ip-api.com/json?lang=zh-CN&fields=city,status',{signal:AbortSignal.timeout?AbortSignal.timeout(4000):undefined}).then(function(r){return r.json();}).then(function(d){
+    if(d.status==='success'&&d.city){
+      var cn=d.city.replace(/市|省/g,'');
+      var matched=Object.keys(CITY_DB).find(function(k){return cn===k||cn.indexOf(k)>=0||k.indexOf(cn)>=0;});
+      if(matched){S.city=matched;sv('sc',matched);updCityDisplay();renderHome();}
     }
-  }
+  }).catch(function(){});
+}
 
-  const pricedPlans = plans.filter(p => p.price > 0);
-  const maxP = Math.max(...pricedPlans.map(p => p.price), 1);
-  const maxM = Math.max(...pricedPlans.map(p => p.minutes), 1);
-  plans.forEach(p => {
-    if (p.price === 0) { p.effScore = 98; return; }
-    const cs = (1 - p.price / maxP) * 48;
-    const ts = (1 - Math.min(p.minutes, maxM) / maxM) * 30;
-    const comfort = p.type==='ridehail'?18:p.type==='hitch'?15:p.type==='combo'?18:p.type==='transit'?9:p.type==='active'&&p.id==='bike'?7:3;
-    p.effScore = Math.min(97, Math.round(cs + ts + comfort));
+function updCityDisplay(){
+  document.getElementById('sbCityTxt').textContent=S.city;
+  var s=document.getElementById('citySelect');if(s)s.value=S.city;
+}
+
+// ===================== ENGINE =====================
+function estMin(km){
+  var c=C(),spd=S.timeType==='peak'?c.vpk:S.timeType==='night'?c.vnm*1.15:c.vnm;
+  return Math.max(3,Math.round(km/spd*60));
+}
+
+function genPlans(km){
+  var c=C(),surge=getSurge(),bMin=estMin(km),bP=(c.base+km*c.pk+bMin*c.pm)*surge;
+  var plans=[];
+  if(km<=2){plans.push({id:'walk',type:'active',name:'步行',icon:'🚶',col:'#34D399',price:0,min:Math.round(km/0.083),wait:0,coupon:'免费 · 零碳出行',url:null,bd:[{l:'步行速度',v:'约5km/h'},{l:'消耗热量',v:'~'+r0(km*68)+'千卡'}]});}
+  if(km<=15){var bm2=Math.round(km/0.2),bl=Math.ceil(bm2/30);plans.push({id:'bike',type:'active',name:'共享单车',icon:'🚲',col:'#FCD34D',price:r1(bl*1.5),min:bm2,wait:1,coupon:'¥1.5/30min最省',url:null,bd:[{l:'骑行时间',v:bm2+'min'},{l:'计费',v:'¥1.5/30min×'+bl+'块'}]});}
+  if(km<=25){var bs=km<=5?1:km<=15?2:3,bsm=Math.round(km/0.22+8);plans.push({id:'bus',type:'transit',name:'公交车',icon:'🚌',col:'#A78BFA',price:r1(bs*c.bp),min:bsm,wait:5,coupon:'固定票价无溢价',url:null,bd:[{l:'单段票价',v:'¥'+c.bp},{l:'乘坐段数',v:bs+'段'}]});}
+  if(c.hm&&km<=45){var mp=Math.min(r0(c.mb+km*0.1),c.mc),mm=Math.round(km/0.65+11);plans.push({id:'metro',type:'transit',name:'地铁',icon:'🚇',col:'#60A5FA',price:mp,min:mm,wait:3,coupon:'固定票价准时可靠',url:null,bd:[{l:'起步价',v:'¥'+c.mb},{l:'封顶价',v:'¥'+c.mc},{l:'时长',v:mm+'min'}]});}
+  if(km>=3){var hp=r1(c.hb+km*c.hk),hw=Math.round(km/7+3);plans.push({id:'hitch',type:'hitch',name:'顺风车',icon:'🟡',col:'#10B981',price:hp,min:bMin+hw,wait:hw,coupon:'固定价不随天气涨',url:'https://v.didi.cn/3Zajzk5?source_id=458986jutuike123456&ref_from=dunion',bd:[{l:'起步价',v:'¥'+c.hb},{l:'里程费',v:'¥'+r1(km*c.hk)},{l:'系数',v:'×1.00 (固定)'}]});}
+  PLATS.forEach(function(p){var n=0.96+Math.random()*0.07,price=r1(bP*p.fac*n),wait=Math.round(2+Math.random()*4);plans.push({id:p.id,type:'ridehail',name:p.name,icon:p.icon,col:p.col,price:price,min:bMin+wait,wait:wait,coupon:p.coupon,url:p.url,bd:[{l:'起步价',v:'¥'+c.base.toFixed(1)},{l:'里程费',v:'¥'+r1(km*c.pk)},{l:'时长费',v:'¥'+r1(bMin*c.pm)},{l:'溢价',v:'×'+surge.toFixed(2)},(p.fac<1?{l:'平台折扣',v:'×'+p.fac}:null)].filter(Boolean)});});
+  if(c.hm&&km>10){
+    var txkm=r1(Math.min(5,km*0.28)),txm=estMin(txkm),txp=r1((c.base+txkm*c.pk+txm*c.pm)*surge);
+    var mkm=r1(km-txkm-0.8),mp2=Math.min(r0(c.mb+mkm*0.1),c.mc),mm2=Math.round(mkm/0.65+8),ct=r1(txp+mp2),cm=txm+4+mm2;
+    var cr=r1(bP*0.87);
+    if(ct<cr*0.83){plans.push({id:'combo',type:'combo',name:'接驳换乘',icon:'🔀',col:'#14B8A6',price:ct,min:cm,wait:3,coupon:'比纯打车省¥'+r1(cr-ct),url:null,isCombo:true,steps:[{ic:'🚖',lb:'打车'+txkm+'km至地铁',dur:txm,pr:txp},{ic:'🚶',lb:'步行进站',dur:4,pr:0},{ic:'🚇',lb:'地铁'+mkm+'km直达',dur:mm2,pr:mp2}],bd:[{l:'打车段',v:'¥'+txp+' · '+txm+'min'},{l:'地铁段',v:'¥'+mp2+' · '+mm2+'min'},{l:'合计',v:'¥'+ct+' · '+cm+'min'}]});}
+  }
+  var pr=plans.filter(function(p){return p.price>0;});
+  var mxP=Math.max.apply(null,pr.map(function(p){return p.price;}))||1,mxM=Math.max.apply(null,pr.map(function(p){return p.min;}))||1;
+  plans.forEach(function(p){
+    if(!p.price){p.eff=98;return;}
+    var cs=(1-p.price/mxP)*48,ts=(1-Math.min(p.min,mxM)/mxM)*30;
+    var cm2=p.type==='ridehail'?18:p.type==='hitch'?16:p.type==='combo'?18:p.type==='transit'?10:p.id==='bike'?7:4;
+    p.eff=Math.min(97,Math.round(cs+ts+cm2));
   });
-  return plans.sort((a, b) => b.effScore - a.effScore);
+  return plans.sort(function(a,b){return b.eff-a.eff;});
 }
 
-function getSunnyInsight(km, weather, time, cd, plans, cityName) {
-  const surge = getSurge(cd, weather, time);
-  const isPeak = time === 'peak';
-  const isRain = weather !== 'sunny';
-  const rides = plans.filter(p => p.type === 'ridehail').sort((a,b) => a.price - b.price);
-  const cheapRide = rides[0];
-  const hitch = plans.find(p => p.type === 'hitch');
-  const metro = plans.find(p => p.id === 'metro');
-  const combo = plans.find(p => p.type === 'combo');
-  const best = plans[0];
+function getAIInsight(km,plans){
+  var c=C(),surge=getSurge(),h=S.timeType,w=S.weather;
+  var rides=plans.filter(function(p){return p.type==='ridehail';}).sort(function(a,b){return a.price-b.price;});
+  var hitch=plans.find(function(p){return p.type==='hitch';});
+  var metro=plans.find(function(p){return p.id==='metro';});
+  var combo=plans.find(function(p){return p.type==='combo';});
+  var cheapR=rides[0],best=plans[0];
+  if(km<=1.5)return km+'km以内步行是最优解。叫车等待约'+(cheapR?cheapR.wait:3)+'分钟，步行只需'+Math.round(km/0.083)+'分钟，时间差极小。健康出行，不用掏手机。';
+  if(km<=3&&w==='sunny'&&h!=='peak'){var bk=plans.find(function(p){return p.id==='bike';});return '晴天短途'+km+'km，共享单车完胜。骑行'+(bk?bk.min:12)+'分钟、只花¥'+(bk?bk.price:1.5)+'，比打车省¥'+r1((cheapR?cheapR.price:15)-(bk?bk.price:1.5))+'，还能运动。打车在这个距离纯属浪费等待时间。';}
+  if(h==='peak'&&w==='storm'&&hitch&&cheapR)return '双重压力：高峰+暴雨，网约车溢价×'+surge.toFixed(2)+'，等待时间大幅延长。顺风车固定价¥'+hitch.price+'锁死不涨，省¥'+r1(cheapR.price-hitch.price)+'。此刻选顺风是绝对正确的。';
+  if(h==='peak'&&metro&&cheapR&&metro.price<cheapR.price*0.5&&km>5)return S.city+'高峰期路面溢价×'+c.sp+'，且实际等待+堵车远超'+Math.round(bMin(km))+'分钟。地铁¥'+metro.price+'比打车省¥'+r1(cheapR.price-metro.price)+'，且时间更可控。强烈推荐地铁。';
+  if(w!=='sunny'&&hitch&&cheapR)return {rain:'雨天',storm:'暴雨'}[w]+'溢价×'+surge.toFixed(2)+'，网约车稀缺且贵。顺风车固定价¥'+hitch.price+'不随天气涨价，省¥'+r1(cheapR.price-hitch.price)+'。多等'+hitch.wait+'分钟换来固定价，完全值得。';
+  if(combo&&cheapR&&combo.price<cheapR.price*0.75)return km+'km中长途，接驳方案¥'+combo.price+'比纯打车省¥'+r1(cheapR.price-combo.price)+'（'+Math.round(r1(cheapR.price-combo.price)/cheapR.price*100)+'%）。打车至地铁站换乘，总时间'+combo.min+'分钟，是兼顾省钱和效率的最优解。';
+  var mxR=rides.length>1?rides[rides.length-1].price:0,diff=cheapR?r1(mxR-cheapR.price):0;
+  return '当前'+{sunny:'晴天',rain:'小雨',storm:'暴雨'}[w]+{normal:'平峰',peak:'高峰',night:'深夜'}[h]+'，各平台价差¥'+diff+'。'+best.name+'效率评分最高（'+best.eff+'分），'+best.coupon+'。'+(hitch?'顺风车¥'+hitch.price+'固定价也是稳妥选择。':'');
+}
+function bMin(km){return Math.max(3,Math.round(km/(S.timeType==='peak'?C().vpk:C().vnm)*60));}
 
-  if (km <= 1.5) return `${km}km以内，步行比叫车更聪明。叫车等待需要${cheapRide?.waitMin||3}分钟，步行只需${Math.round(km/0.083)}分钟，时间差几乎为零。不用掏手机，直接走。`;
-
-  if (km <= 3 && weather === 'sunny' && time !== 'peak') {
-    const bikeP = plans.find(p => p.id==='bike');
-    const bikeSave = bikeP ? r1((cheapRide?.price||0) - bikeP.price) : 0;
-    return `晴天短途${km}km，共享单车是最优解。骑行${bikeP?.minutes||0}分钟、只花¥${bikeP?.price||0}，比打车省¥${bikeSave}，还能顺便运动一下。打车在这个距离是在浪费等待时间。`;
-  }
-
-  if (isPeak && isRain && hitch) {
-    const diff = r1((cheapRide?.price||0) - hitch.price);
-    return `双重压力：${TIME_META[time].label}+${WEATHER_META[weather].label}，网约车溢价已达×${surge.toFixed(2)}，且等待拉长至${cheapRide?.waitMin||5}min以上。顺风车固定价¥${hitch.price}锁死不涨价，比最便宜网约车省¥${diff}。多等${hitch.waitMin}分钟，完全值得。`;
-  }
-
-  if (isPeak && metro && metro.price < (cheapRide?.price||0) * 0.5 && km > 5) {
-    const saving = r1((cheapRide?.price||0) - metro.price);
-    const timeDiff = metro.minutes - (cheapRide?.minutes||0);
-    return `${cityName||''}高峰期，路面溢价×${cd.surge_peak}。地铁¥${metro.price}比打车省¥${saving}，时间${timeDiff > 0 ? '多'+timeDiff : '少'+Math.abs(timeDiff)}分钟——但高峰期打车实际更堵，地铁的时间优势被严重低估了。`;
-  }
-
-  if (isRain && hitch) {
-    const diff = r1((cheapRide?.price||0) - hitch.price);
-    return `${WEATHER_META[weather].label}天叫车需求激增，溢价×${surge.toFixed(2)}已生效。顺风车固定价¥${hitch.price}不跟天气上涨，比最便宜网约车省¥${diff}。雨天顺风是最优解，多等${hitch.waitMin}分钟换来固定价。`;
-  }
-
-  if (combo && combo.price < (cheapRide?.price||0) * 0.75 && km > 12) {
-    const saving = Math.round((cheapRide?.price||0) - combo.price);
-    return `${km}km中长途，接驳方案可省¥${saving}（${Math.round(saving/((cheapRide?.price||1))*100)}%）：打车${combo.comboSteps?.[0]?.duration}分钟至地铁站¥${combo.comboSteps?.[0]?.price}，再坐地铁直达¥${combo.comboSteps?.[2]?.price}，总计¥${combo.price}。比纯打车值得多。`;
-  }
-
-  const maxRideP = rides[rides.length-1]?.price || 0;
-  const diff = r1(maxRideP - (cheapRide?.price||0));
-  return `当前${WEATHER_META[weather].label}平峰，各平台差价¥${diff}。${best.name}效率评分最高（${best.effScore}分），${best.coupon}。${hitch?`顺风车¥${hitch.price}固定价也是不错选择。`:''}`;
+// SEARCH
+function doSearch(){
+  var km=parseFloat(document.getElementById('kmInp').value);
+  if(!km||km<0.5){alert('请输入有效距离（≥ 0.5 km）');return;}
+  S.currentKm=km;S.currentFrom=document.getElementById('fromInp').value;S.currentTo=document.getElementById('toInp').value;
+  var btn=document.getElementById('searchBtn');btn.disabled=true;btn.innerHTML='<div class="spin"></div><span>AI 分析中…</span>';
+  setTimeout(function(){
+    S.currentPlans=genPlans(km);btn.disabled=false;btn.innerHTML='✦ AI 智能分析出行方案';
+    // update stats
+    var rides=S.currentPlans.filter(function(p){return p.type==='ridehail';}).sort(function(a,b){return a.price-b.price;});
+    var h=S.currentPlans.find(function(p){return p.type==='hitch';});
+    if(rides.length>1&&h){var sv2=Math.max(0,rides[rides.length-1].price-h.price);if(sv2>0){S.totalSaved+=sv2;sv('ss',S.totalSaved.toFixed(2));}}
+    S.tripCount++;sv('tc',S.tripCount);
+    var today=new Date().getDay();S.weekData[today]=(S.weekData[today]||0)+1;sv('wd',JSON.stringify(S.weekData));
+    // mode tracking
+    if(S.currentPlans[0])S.modeUsage[S.currentPlans[0].type]=(S.modeUsage[S.currentPlans[0].type]||0)+1;sv('mu',JSON.stringify(S.modeUsage));
+    updSavedDisplay();
+    showResults();
+  },950);
 }
 
-// ========== UI COMPONENTS ==========
-function Dots() {
-  return (
-    <div style={{display:'flex',gap:4,alignItems:'center',padding:'3px 0'}}>
-      {[0,1,2].map(i => (
-        <div key={i} className={`dot d${i}`} style={{width:5,height:5,borderRadius:'50%',background:'#F59E0B'}}/>
-      ))}
-    </div>
-  );
+function showResults(){
+  document.getElementById('tripInput').style.display='none';
+  document.getElementById('tripResults').style.display='block';
+  // ctx
+  var tags=[S.currentFrom?'🟢 '+S.currentFrom:'',S.currentTo?'🔴 '+S.currentTo:'',{sunny:'☀️',rain:'🌧️',storm:'⛈️'}[S.weather]+' '+{sunny:'晴天',rain:'小雨',storm:'暴雨'}[S.weather],{normal:'🟢 平峰',peak:'🔴 高峰',night:'🌙 深夜'}[S.timeType],'🛣️ '+S.currentKm+'km'].filter(Boolean);
+  document.getElementById('ctxResult').innerHTML=tags.map(function(t){return '<span class="ctx-t">'+t+'</span>';}).join('');
+  // savings
+  var rides=S.currentPlans.filter(function(p){return p.type==='ridehail';}).sort(function(a,b){return a.price-b.price;});
+  var h=S.currentPlans.find(function(p){return p.type==='hitch';});
+  var ms=rides.length>1&&h?r1(rides[rides.length-1].price-h.price):0;
+  var sb=document.getElementById('rSavings');
+  if(ms>1.5){sb.innerHTML='<div class="savings-row"><div><div style="font-size:.58rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.28);margin-bottom:3px">Smart Savings</div><div style="font-size:1.5rem;font-weight:800;color:#10B981;font-variant-numeric:tabular-nums">省 ¥'+ms.toFixed(1)+'</div><div style="font-size:.6rem;color:rgba(255,255,255,.32);margin-top:2px">顺风固定价 vs 最贵网约车</div></div><div style="font-size:.7rem;font-weight:700;color:#10B981;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.22);border-radius:99px;padding:5px 11px">省'+Math.round(ms/rides[rides.length-1].price*100)+'%</div></div>';}
+  else sb.innerHTML='';
+  // AI
+  document.getElementById('rDots').style.display='block';document.getElementById('rAiTxt').textContent='';
+  setTimeout(function(){document.getElementById('rDots').style.display='none';typeText('rAiTxt',getAIInsight(S.currentKm,S.currentPlans));},700);
+  renderPlans();renderMatrix();renderPromos();
+  setTimeout(function(){document.getElementById('tripResults').scrollIntoView({behavior:'smooth',block:'start'});},160);
 }
 
-function Splash({ onDone }) {
-  useEffect(() => { const t = setTimeout(onDone, 2400); return () => clearTimeout(t); }, []);
-  return (
-    <div style={{position:'fixed',inset:0,background:'#080E1A',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:22,zIndex:9999}}>
-      <div style={{position:'relative',width:80,height:80,display:'flex',alignItems:'center',justifyContent:'center'}}>
-        <div className="splash-ring"/>
-        <div className="splash-glow"/>
-        <div style={{position:'relative',zIndex:1,width:76,height:76,borderRadius:'50%',background:'#080E1A',border:'2px solid rgba(245,158,11,.5)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'2rem'}}>✦</div>
-      </div>
-      <div style={{fontWeight:800,fontSize:'1rem',letterSpacing:'0.2em',color:'#F59E0B',fontFamily:"'DM Sans'"}}>SUNNY AI</div>
-      <div style={{width:150,height:2,background:'rgba(255,255,255,.07)',borderRadius:99,overflow:'hidden'}}>
-        <div className="splash-bar-fill"/>
-      </div>
-      <div style={{fontFamily:"'DM Mono'",fontSize:'0.65rem',color:'rgba(255,255,255,.25)',letterSpacing:'0.06em',animation:'blink .9s steps(1) infinite'}}>初始化决策引擎…</div>
-    </div>
-  );
+function renderPlans(){
+  var bg={ridehail:'rgba(245,158,11,.052)',hitch:'rgba(16,185,129,.065)',transit:'rgba(59,130,246,.052)',combo:'rgba(20,184,166,.062)',active:'rgba(52,211,153,.04)'};
+  var bdr={ridehail:'rgba(255,255,255,.07)',hitch:'rgba(16,185,129,.28)',transit:'rgba(59,130,246,.2)',combo:'rgba(20,184,166,.28)',active:'rgba(52,211,153,.17)'};
+  var tlbl={ridehail:'网约车 · 动态计价',hitch:'顺风车 · 固定价',transit:'公共交通',combo:'组合换乘 · AI推荐',active:'绿色出行'};
+  var cont=document.getElementById('rCards');cont.innerHTML='';
+  S.currentPlans.forEach(function(p,i){
+    var isTop=i===0,bdrC=isTop&&p.type==='ridehail'?'rgba(245,158,11,.32)':(bdr[p.type]||'rgba(255,255,255,.07)');
+    var prH=p.price>0?'<div style="font-size:1.5rem;font-weight:800;line-height:1;color:'+p.col+';font-variant-numeric:tabular-nums">¥'+p.price.toFixed(1)+'</div><div style="font-size:.58rem;color:rgba(255,255,255,.3);margin-top:2px">'+p.min+'min</div>':'<div style="font-size:1.1rem;font-weight:700;color:#34D399">免费</div>';
+    var r=12,circ=2*Math.PI*r,dash=(p.eff/100)*circ;
+    var ringH='<div class="eff-ring"><svg class="eff-svg" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="'+r+'" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="2.2"/><circle cx="16" cy="16" r="'+r+'" fill="none" stroke="'+p.col+'" stroke-width="2.2" stroke-dasharray="'+dash.toFixed(1)+' '+circ.toFixed(1)+'" stroke-linecap="round"/></svg><div class="eff-lbl" style="color:'+p.col+'">'+p.eff+'</div></div>';
+    var comboH=p.isCombo&&p.steps?'<div class="combo-steps">'+p.steps.map(function(s,si){return '<div class="cs"><div style="font-size:.95rem">'+s.ic+'</div><div style="font-size:.56rem;color:rgba(255,255,255,.36);text-align:center;line-height:1.2;max-width:60px">'+s.lb+'</div><div style="font-size:.6rem;color:#14B8A6;font-weight:600">'+(s.pr>0?'¥'+s.pr:'免费')+'</div><div style="font-size:.54rem;color:rgba(255,255,255,.26)">'+s.dur+'min</div></div>'+(si<p.steps.length-1?'<div class="cs-line"></div>':'');}).join('')+'</div>':'';
+    var btnH=p.url?'<button class="btn-ghost" style="margin-top:8px;font-size:.72rem;padding:8px" data-url="'+p.url+'">🎟️ 领取优惠 · 立即叫车 →</button>':'';
+    var div=document.createElement('div');
+    div.className='plan-card '+(isTop?'plan-glow':'');div.style.cssText='background:'+bg[p.type]+';border:1px solid '+bdrC+';animation-delay:'+(i*0.06)+'s';
+    div.innerHTML=(isTop?'<div class="plan-top">AI 最优</div><div class="plan-shimmer"></div>':'')
+      +'<div style="display:flex;align-items:center;gap:9px;margin-bottom:'+(p.isCombo?'0':'8px')+'">'
+      +'<div class="plan-icon">'+p.icon+'</div>'
+      +'<div style="flex:1;min-width:0"><div style="font-weight:700;font-size:.88rem;color:#F1F5F9">'+p.name+'</div><div style="font-size:.6rem;color:rgba(255,255,255,.36);margin-top:2px">'+tlbl[p.type]+'</div></div>'
+      +'<div style="text-align:right;flex-shrink:0;margin-right:5px">'+prH+'</div>'+ringH+'</div>'
+      +comboH
+      +'<div style="display:flex;align-items:center;justify-content:space-between;margin-top:7px">'
+      +'<div style="display:flex;gap:4px;flex-wrap:wrap"><span class="tag tag-n">⏳ '+(p.wait>0?'等'+p.wait+'min':'即刻')+'</span>'+(p.type==='hitch'?'<span class="tag tag-g">🏷️ 固定价</span>':'')+(p.type==='combo'?'<span class="tag tag-t">🔀 换乘</span>':'')+'</div>'
+      +(p.coupon?'<span style="font-size:.6rem;font-weight:600;color:'+(p.type==='active'||p.type==='transit'?'rgba(255,255,255,.3)':p.col)+'">'+p.coupon+'</span>':'')
+      +'</div>'+btnH;
+    var dp=p;
+    div.addEventListener('click',function(e){if(e.target.tagName==='BUTTON')return;openDetailDrawer(dp);});
+    if(p.url){div.querySelector('[data-url]').addEventListener('click',function(e){e.stopPropagation();window.open(p.url,'_blank');});}
+    cont.appendChild(div);
+  });
 }
 
-function Header({ city, totalSaved, onSettings }) {
-  return (
-    <header style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'16px 0 12px'}}>
-      <div>
-        <div style={{display:'flex',alignItems:'center',gap:7}}>
-          <span style={{fontSize:'1.15rem',color:'#F59E0B'}}>✦</span>
-          <span style={{fontWeight:800,fontSize:'0.92rem',letterSpacing:'0.07em',color:'#F1F5F9'}}>SUNNY AI</span>
-          <span style={{background:'rgba(20,184,166,.12)',border:'1px solid rgba(20,184,166,.28)',borderRadius:99,padding:'2px 7px',fontSize:'0.58rem',fontWeight:700,color:'#14B8A6',letterSpacing:'0.06em'}}>LIVE</span>
-        </div>
-        <div style={{display:'flex',alignItems:'center',gap:8,marginTop:3}}>
-          <span style={{fontSize:'0.67rem',color:'rgba(255,255,255,.32)'}}>📍 {city}</span>
-          {totalSaved > 0.5 && (
-            <span style={{fontSize:'0.67rem',fontFamily:"'DM Mono'",color:'#10B981'}}>智能节省 ¥{totalSaved.toFixed(0)}</span>
-          )}
-        </div>
-      </div>
-      <button onClick={onSettings}
-        style={{background:'rgba(255,255,255,.05)',border:'1px solid rgba(255,255,255,.09)',borderRadius:10,padding:'8px 11px',color:'rgba(255,255,255,.45)',cursor:'pointer',fontSize:'0.9rem'}}>
-        ⚙️
-      </button>
-    </header>
-  );
+function renderMatrix(){
+  var rides=S.currentPlans.filter(function(p){return p.type==='ridehail';}).sort(function(a,b){return a.price-b.price;});
+  var ms=document.getElementById('rMatrix');
+  if(rides.length<2){ms.innerHTML='';return;}
+  var mn=rides[0].price,mx=rides[rides.length-1].price,rng=mx-mn||1;
+  var rows=rides.map(function(r,i){
+    var w=Math.round((r.price-mn)/rng*65+35);
+    return '<div class="mrow" style="margin-bottom:'+(i<rides.length-1?7:0)+'px">'
+      +'<span style="font-size:.95rem;width:20px;text-align:center;flex-shrink:0">'+r.icon+'</span>'
+      +'<div style="width:58px;font-size:.68rem;color:rgba(255,255,255,.5);flex-shrink:0;font-weight:'+(i===0?700:400)+';overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+r.name+'</div>'
+      +'<div class="mbar-w"><div class="mbar" style="width:'+w+'%;background:'+(i===0?'#10B981':r.col)+'"></div></div>'
+      +'<div style="font-size:.78rem;font-weight:700;width:44px;text-align:right;flex-shrink:0;color:'+(i===0?'#10B981':r.col)+';font-variant-numeric:tabular-nums">¥'+r.price.toFixed(1)+'</div>'
+      +(i===0?'<span class="tag tag-g" style="font-size:.55rem;padding:2px 6px;flex-shrink:0">最低</span>':'')
+      +'</div>';
+  }).join('');
+  ms.innerHTML='<div class="sec">全网比价矩阵</div><div class="matrix"><div class="sec" style="margin-bottom:10px">平台横向对比</div>'+rows+'</div>';
 }
 
-function ContextChips({ weather, time, onWeather, onTime }) {
-  const wm = WEATHER_META[weather], tm = TIME_META[time];
-  return (
-    <div style={{display:'flex',gap:6,marginBottom:11,flexWrap:'wrap'}}>
-      <button onClick={onWeather}
-        style={{display:'inline-flex',alignItems:'center',gap:5,background:'rgba(255,255,255,.05)',border:'1px solid rgba(255,255,255,.09)',borderRadius:99,padding:'5px 12px',fontSize:'0.7rem',fontWeight:600,color:'rgba(241,245,249,.65)',cursor:'pointer'}}>
-        {wm.icon} {wm.label}
-      </button>
-      <button onClick={onTime}
-        style={{display:'inline-flex',alignItems:'center',gap:5,background:'rgba(255,255,255,.05)',border:'1px solid rgba(255,255,255,.09)',borderRadius:99,padding:'5px 12px',fontSize:'0.7rem',fontWeight:600,color:'rgba(241,245,249,.65)',cursor:'pointer'}}>
-        {tm.icon} {tm.label}
-      </button>
-    </div>
-  );
+function renderPromos(){
+  document.getElementById('rPromos').innerHTML=PROMOS.map(function(p){return '<div class="promo-i" data-url="'+p.url+'"><div style="font-size:1.35rem">'+p.ico+'</div><div style="font-weight:700;font-size:.72rem;color:'+p.col+'">'+p.name+'</div><div style="font-size:.6rem;color:rgba(255,255,255,.3)">'+p.sub+'</div></div>';}).join('');
+  document.getElementById('rPromos').querySelectorAll('.promo-i').forEach(function(el){el.addEventListener('click',function(){window.open(el.dataset.url,'_blank');});});
 }
 
-function LocationInput({ from, to, onFrom, onTo, onSwap }) {
-  const [fromSugg, setFromSugg] = useState([]);
-  const [toSugg, setToSugg] = useState([]);
-  const [focus, setFocus] = useState(null);
-
-  const sugg = v => v ? PLACES.filter(p => p.includes(v)).slice(0,5) : PLACES.slice(0,6);
-
-  const SuggList = ({ list, onSelect }) => list.length ? (
-    <div style={{position:'absolute',top:'calc(100% + 4px)',left:0,right:0,background:'#0C1626',border:'1px solid rgba(255,255,255,.1)',borderRadius:12,overflow:'hidden',boxShadow:'0 18px 40px rgba(0,0,0,.65)',zIndex:80,animation:'fadeIn .15s ease'}}>
-      {list.map(s => (
-        <div key={s} onMouseDown={() => onSelect(s)}
-          style={{padding:'10px 14px',fontSize:'0.82rem',color:'#E2E8F0',cursor:'pointer',borderBottom:'1px solid rgba(255,255,255,.04)',display:'flex',alignItems:'center',gap:7}}>
-          <span style={{fontSize:'0.8rem',opacity:.6}}>📍</span> {s}
-        </div>
-      ))}
-    </div>
-  ) : null;
-
-  return (
-    <div style={{position:'relative',marginBottom:11}}>
-      <div style={{position:'relative',marginBottom:3}}>
-        <div style={{position:'absolute',left:13,top:'50%',transform:'translateY(-50%)',width:9,height:9,borderRadius:'50%',background:'#10B981',boxShadow:'0 0 7px #10B981',zIndex:2,pointerEvents:'none'}}/>
-        <input value={from} onChange={e=>{onFrom(e.target.value);setFromSugg(sugg(e.target.value));}}
-          onFocus={()=>{setFocus('from');setFromSugg(sugg(from));}} onBlur={()=>setTimeout(()=>setFocus(null),200)}
-          placeholder="出发地" style={{width:'100%',background:'rgba(255,255,255,.055)',border:'1px solid rgba(255,255,255,.09)',borderRadius:'12px 12px 3px 3px',padding:'12px 40px 12px 30px',fontFamily:"'DM Sans'",fontSize:'0.88rem',color:'#F1F5F9',transition:'border-color .2s'}}
-          onFocusCapture={e=>e.target.style.borderColor='rgba(245,158,11,.4)'}
-          onBlurCapture={e=>e.target.style.borderColor='rgba(255,255,255,.09)'}
-        />
-        {focus==='from' && <SuggList list={fromSugg} onSelect={v=>{onFrom(v);setFocus(null);}}/>}
-      </div>
-      <div style={{position:'absolute',left:17,top:47,width:1,height:16,background:'rgba(255,255,255,.1)',zIndex:0}}/>
-      <button onClick={onSwap}
-        style={{position:'absolute',right:10,top:'50%',transform:'translateY(-50%)',background:'rgba(245,158,11,.1)',border:'1px solid rgba(245,158,11,.25)',borderRadius:8,padding:'5px 11px',color:'#F59E0B',cursor:'pointer',fontSize:'0.85rem',zIndex:3,transition:'all .18s'}}>
-        ⇅
-      </button>
-      <div style={{position:'relative'}}>
-        <div style={{position:'absolute',left:13,top:'50%',transform:'translateY(-50%)',width:9,height:9,borderRadius:2,background:'#EF4444',boxShadow:'0 0 7px #EF4444',zIndex:2,pointerEvents:'none'}}/>
-        <input value={to} onChange={e=>{onTo(e.target.value);setToSugg(sugg(e.target.value));}}
-          onFocus={()=>{setFocus('to');setToSugg(sugg(to));}} onBlur={()=>setTimeout(()=>setFocus(null),200)}
-          placeholder="目的地" style={{width:'100%',background:'rgba(255,255,255,.055)',border:'1px solid rgba(255,255,255,.09)',borderRadius:'3px 3px 12px 12px',padding:'12px 40px 12px 30px',fontFamily:"'DM Sans'",fontSize:'0.88rem',color:'#F1F5F9',transition:'border-color .2s'}}
-          onFocusCapture={e=>e.target.style.borderColor='rgba(245,158,11,.4)'}
-          onBlurCapture={e=>e.target.style.borderColor='rgba(255,255,255,.09)'}
-        />
-        {focus==='to' && <SuggList list={toSugg} onSelect={v=>{onTo(v);setFocus(null);}}/>}
-      </div>
-    </div>
-  );
+// ===================== AI CHAT =====================
+var chatHistory=[];
+var chatLoading=false;
+function setupChat(){
+  document.getElementById('chatSendBtn').addEventListener('click',function(){
+    var v=document.getElementById('chatInp').value.trim();if(!v)return;sendChat(v);
+  });
+  document.getElementById('chatInp').addEventListener('keydown',function(e){
+    if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();var v=this.value.trim();if(v)sendChat(v);}
+  });
+  document.getElementById('clearChatBtn').addEventListener('click',function(){chatHistory=[];document.getElementById('chatMessages').innerHTML='';addAIMsg('你好！我是 Sunny，你的 AI 出行顾问。可以问我任何关于 '+S.city+' 出行的问题，我会根据当前时间、天气、路况给你最实用的建议。');});
+  // Initial greeting
+  setTimeout(function(){addAIMsg('你好！我是 Sunny ✦，你的 AI 出行顾问。\n\n当前 '+S.city+' '+{sunny:'晴天',rain:'小雨',storm:'暴雨'}[S.weather]+'，'+{normal:'平峰',peak:'高峰',night:'深夜'}[S.timeType]+'时段。可以问我任何出行问题，我来帮你决策 👇');},200);
 }
 
-function QuickDist({ onSelect }) {
-  return (
-    <div style={{display:'flex',gap:6,marginBottom:11,flexWrap:'wrap'}}>
-      {[2,5,10,20,35].map(d => (
-        <button key={d} onClick={()=>onSelect(d)}
-          style={{background:'rgba(255,255,255,.045)',border:'1px solid rgba(255,255,255,.08)',borderRadius:99,padding:'5px 12px',fontSize:'0.7rem',fontWeight:600,color:'rgba(241,245,249,.55)',cursor:'pointer',transition:'all .15s'}}>
-          {d}km
-        </button>
-      ))}
-      <button onClick={()=>{const v=prompt('输入距离（km）：');if(v&&!isNaN(v)&&parseFloat(v)>0)onSelect(parseFloat(v));}}
-        style={{background:'rgba(255,255,255,.03)',border:'1px solid rgba(255,255,255,.07)',borderRadius:99,padding:'5px 12px',fontSize:'0.7rem',fontWeight:600,color:'rgba(241,245,249,.35)',cursor:'pointer'}}>
-        自定义
-      </button>
-    </div>
-  );
+function sendChat(q){
+  if(chatLoading)return;
+  document.getElementById('chatInp').value='';
+  addUserMsg(q);chatHistory.push({role:'user',content:q});
+  chatLoading=true;document.getElementById('chatSendBtn').disabled=true;
+  S.aiChats++;sv('ac',S.aiChats);
+  // Add typing bubble
+  var typingId='typing_'+Date.now();
+  var msgs=document.getElementById('chatMessages');
+  var typingDiv=document.createElement('div');typingDiv.className='msg-ai';typingDiv.id=typingId;
+  typingDiv.innerHTML='<div style="width:28px;height:28px;border-radius:50%;background:rgba(245,158,11,.14);border:1.5px solid rgba(245,158,11,.3);display:flex;align-items:center;justify-content:center;font-size:.8rem;color:#F59E0B;flex-shrink:0">✦</div><div class="bubble-ai"><div class="typing"><div class="dot"></div><div class="dot d1"></div><div class="dot d2"></div></div></div>';
+  msgs.appendChild(typingDiv);msgs.scrollTop=msgs.scrollHeight;
+  callAI(q,function(reply){
+    var td=document.getElementById(typingId);if(td)td.remove();
+    chatHistory.push({role:'assistant',content:reply});
+    addAIMsg(reply);chatLoading=false;document.getElementById('chatSendBtn').disabled=false;
+  });
 }
 
-function SunnyCard({ insight, loading }) {
-  const [text, setText] = useState('');
-  const [typing, setTyping] = useState(false);
-
-  useEffect(() => {
-    if (!insight) return;
-    setText(''); setTyping(true); let i = 0;
-    const iv = setInterval(() => {
-      setText(insight.slice(0, ++i));
-      if (i >= insight.length) { clearInterval(iv); setTyping(false); }
-    }, 13);
-    return () => clearInterval(iv);
-  }, [insight]);
-
-  return (
-    <div style={{background:'linear-gradient(135deg,rgba(245,158,11,.065),rgba(99,102,241,.04))',border:'1px solid rgba(245,158,11,.2)',borderRadius:18,padding:14,marginBottom:14}}>
-      <div style={{display:'flex',alignItems:'center',gap:9,marginBottom:10}}>
-        <div style={{width:34,height:34,borderRadius:'50%',background:'rgba(245,158,11,.14)',border:'1.5px solid rgba(245,158,11,.32)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1rem',flexShrink:0,color:'#F59E0B'}}>✦</div>
-        <div style={{flex:1}}>
-          <div style={{fontSize:'0.72rem',fontWeight:700,color:'#F59E0B',letterSpacing:'0.04em'}}>SUNNY · AI 决策引擎</div>
-          <div style={{fontSize:'0.6rem',color:'rgba(255,255,255,.28)',marginTop:1,fontFamily:"'DM Mono'"}}>基于城市定价 + 实时环境分析</div>
-        </div>
-        {(loading || typing) && <Dots/>}
-      </div>
-      <div style={{fontSize:'0.84rem',lineHeight:1.72,color:'#E2E8F0',minHeight:44}}>
-        {loading ? <Dots/> : (
-          <>
-            {text}
-            {typing && <span style={{opacity:.7,animation:'blink .5s steps(1) infinite'}}>|</span>}
-          </>
-        )}
-      </div>
-    </div>
-  );
+function callAI(q,cb){
+  var c=C(),surge=getSurge();
+  var sysCtx='你是Sunny，专业AI出行顾问，风格简洁犀利如优秀产品经理。当前城市：'+S.city+'，天气：'+{sunny:'晴天',rain:'小雨',storm:'暴雨'}[S.weather]+'，时段：'+{normal:'平峰',peak:'高峰',night:'深夜'}[S.timeType]+'，当前溢价系数：'+surge.toFixed(2)+'，网约车5km参考价：¥'+r1((c.base+5*c.pk+Math.round(5/c.vnm*60)*c.pm)*surge)+'，顺风车5km：¥'+r1(c.hb+5*c.hk)+'，地铁：¥'+Math.min(r0(c.mb+5*0.1),c.mc)+'。回答要直接、有数据支撑、不超过120字，禁止markdown格式。';
+  var engine=S.aiEngine,key=S.apiKey;
+  if(engine==='demo'||!key){setTimeout(function(){cb(demoAIReply(q,c,surge));},900);return;}
+  var url=engine==='qwen'?QWEN_API:'https://api.openai.com/v1/chat/completions';
+  var model=engine==='qwen'?'qwen-plus':'gpt-4o-mini';
+  var msgs=[{role:'system',content:sysCtx}].concat(chatHistory.slice(-4));
+  msgs[msgs.length-1]={role:'user',content:q};
+  fetch(url,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},body:JSON.stringify({model:model,messages:msgs,max_tokens:200})})
+    .then(function(r){return r.json();}).then(function(d){
+      var txt=d.choices&&d.choices[0]?d.choices[0].message.content:'';
+      cb(txt||demoAIReply(q,c,surge));
+    }).catch(function(){cb(demoAIReply(q,c,surge));});
 }
 
-function EffRing({ score, color }) {
-  const r = 13, circ = 2*Math.PI*r;
-  const dash = (score/100)*circ;
-  return (
-    <div style={{position:'relative',width:34,height:34,flexShrink:0}}>
-      <svg width="34" height="34" viewBox="0 0 34 34" style={{transform:'rotate(-90deg)'}}>
-        <circle cx="17" cy="17" r={r} fill="none" stroke="rgba(255,255,255,.07)" strokeWidth="2.5"/>
-        <circle cx="17" cy="17" r={r} fill="none" stroke={color} strokeWidth="2.5"
-          strokeDasharray={`${dash} ${circ}`} strokeLinecap="round" style={{transition:'stroke-dasharray .7s ease'}}/>
-      </svg>
-      <div style={{position:'absolute',inset:0,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'0.52rem',fontWeight:700,color,fontFamily:"'DM Mono'"}}>
-        {score}
-      </div>
-    </div>
-  );
+function demoAIReply(q,c,surge){
+  var ql=q.toLowerCase(),city=S.city,w={sunny:'晴天',rain:'小雨',storm:'暴雨'}[S.weather],t={normal:'平峰',peak:'高峰',night:'深夜'}[S.timeType];
+  var ref5=r1((c.base+5*c.pk+Math.round(5/c.vnm*60)*c.pm)*surge),h5=r1(c.hb+5*c.hk),m5=Math.min(r0(c.mb+5*0.1),c.mc);
+  if(ql.indexOf('省')>=0||ql.indexOf('便宜')>=0||ql.indexOf('最低')>=0)return city+w+t+'：顺风车固定价¥'+h5+'（5km）是最省选择，比网约车¥'+ref5+'省¥'+r1(ref5-h5)+'。花小猪新客首单-¥8效果更好，但要等'+Math.round(h5/7+3)+'分钟。时间充裕优选顺风，时间紧优选花小猪+新客券。';
+  if(ql.indexOf('高峰')>=0||ql.indexOf('堵')>=0)return city+'高峰期溢价×'+c.sp+'，现在打车¥'+r1(ref5*c.sp)+'（5km）。建议：①等高峰后15分钟，价格骤降；②顺风车固定价¥'+h5+'完全不受影响；③地铁¥'+m5+'最稳定准时。选择取决于时间弹性。';
+  if(ql.indexOf('雨')>=0||ql.indexOf('天气')>=0)return {sunny:'当前晴天，所有平台正常定价，是比价最好时机。顺风车¥'+h5+'，网约车¥'+ref5+'，差价¥'+r1(ref5-h5)+'。',rain:'小雨天打车需求激增，溢价×'+c.sr+'。顺风车固定价¥'+h5+'是雨天最优解，比网约车省¥'+r1(ref5*c.sr-h5)+'，等'+Math.round(h5/7+3)+'分钟换来固定价值得。',storm:'暴雨！网约车溢价×'+(c.sr*1.16).toFixed(2)+'，既贵又难叫。顺风车固定价¥'+h5+'是唯一靠谱选项。实在叫不到就候车区等，别在街上等。'}[S.weather];
+  if(ql.indexOf('地铁')>=0||ql.indexOf('公交')>=0)return '地铁：¥'+m5+'起步，封顶¥'+c.mc+'，不受天气溢价影响，适合5-40km且沿线路线。vs打车：当前5km约¥'+ref5+'，速度快但贵。判断标准：时间不紧+路线覆盖→选地铁；赶时间或末班后→选打车。';
+  if(ql.indexOf('顺风')>=0)return '顺风车优势：固定价¥'+h5+'（5km），雨天高峰不涨价，比网约车省'+Math.round(r1(ref5-h5)/ref5*100)+'%。缺点：等待'+Math.round(h5/7+3)+'min，发车时间不固定。适合：不急、距离>5km、雨天/高峰期。滴滴顺风+嘀嗒都可以，后者有时更便宜。';
+  return city+' · '+w+' · '+t+'：网约车5km约¥'+ref5+'，顺风车¥'+h5+'（固定），地铁¥'+m5+'。当前溢价×'+surge.toFixed(2)+'。推荐：'+(surge>1.2?'顺风车固定价最优，省¥'+r1(ref5-h5)+'。':'花小猪+新客券性价比最佳。');
 }
 
-function ComboSteps({ steps }) {
-  return (
-    <div style={{display:'flex',alignItems:'center',margin:'9px 0 2px',background:'rgba(20,184,166,.04)',border:'1px solid rgba(20,184,166,.14)',borderRadius:10,padding:'8px 10px',gap:0,overflowX:'auto'}}>
-      {steps.map((s, i) => (
-        <React.Fragment key={i}>
-          <div style={{display:'flex',flexDirection:'column',alignItems:'center',gap:2,flexShrink:0,minWidth:64}}>
-            <span style={{fontSize:'1rem'}}>{s.icon}</span>
-            <div style={{fontSize:'0.58rem',color:'rgba(255,255,255,.4)',textAlign:'center',lineHeight:1.25,maxWidth:62}}>{s.label}</div>
-            <div style={{fontFamily:"'DM Mono'",fontSize:'0.62rem',color:'#14B8A6',fontWeight:600}}>{s.price>0?`¥${s.price}`:'免费'}</div>
-            <div style={{fontFamily:"'DM Mono'",fontSize:'0.56rem',color:'rgba(255,255,255,.28)'}}>{s.duration}min</div>
-          </div>
-          {i < steps.length-1 && <div style={{flex:1,height:1,background:'rgba(20,184,166,.2)',margin:'0 4px',minWidth:12}}/>}
-        </React.Fragment>
-      ))}
-    </div>
-  );
+function addAIMsg(txt){
+  var msgs=document.getElementById('chatMessages');
+  var div=document.createElement('div');div.className='msg-ai';
+  div.innerHTML='<div style="width:28px;height:28px;border-radius:50%;background:rgba(245,158,11,.14);border:1.5px solid rgba(245,158,11,.3);display:flex;align-items:center;justify-content:center;font-size:.8rem;color:#F59E0B;flex-shrink:0">✦</div><div class="bubble-ai"></div>';
+  msgs.appendChild(div);msgs.scrollTop=msgs.scrollHeight;
+  typeText2(div.querySelector('.bubble-ai'),txt);
+}
+function addUserMsg(txt){
+  var msgs=document.getElementById('chatMessages');
+  var div=document.createElement('div');div.className='msg-user';
+  div.innerHTML='<div class="bubble-user">'+txt+'</div>';
+  msgs.appendChild(div);msgs.scrollTop=msgs.scrollHeight;
+}
+function typeText2(el,txt){
+  el.textContent='';var i=0;
+  var iv=setInterval(function(){
+    if(i<txt.length){el.textContent+=txt[i++];var msgs=document.getElementById('chatMessages');msgs.scrollTop=msgs.scrollHeight;}
+    else clearInterval(iv);
+  },12);
 }
 
-function PlanCard({ plan, index, isTop, onOpen }) {
-  const bgMap = {ridehail:'rgba(245,158,11,.06)',hitch:'rgba(16,185,129,.07)',transit:'rgba(59,130,246,.06)',combo:'rgba(20,184,166,.07)',active:'rgba(52,211,153,.05)'};
-  const bdrMap = {ridehail:isTop?'rgba(245,158,11,.42)':'rgba(255,255,255,.07)',hitch:'rgba(16,185,129,.3)',transit:'rgba(59,130,246,.24)',combo:'rgba(20,184,166,.32)',active:'rgba(52,211,153,.2)'};
-  return (
-    <div className={`plan-card pc pc${index} ${isTop?'best-glow':''}`}
-      onClick={() => onOpen(plan)}
-      style={{background:bgMap[plan.type]||'rgba(255,255,255,.04)',border:`1px solid ${bdrMap[plan.type]||'rgba(255,255,255,.07)'}`,borderRadius:18,padding:13,position:'relative',overflow:'hidden',cursor:'pointer',transition:'transform .14s',WebkitTransition:'transform .14s'}}
-      onTouchStart={e=>e.currentTarget.style.transform='scale(.98)'}
-      onTouchEnd={e=>e.currentTarget.style.transform='scale(1)'}
-    >
-      {isTop && <div className="top-shimmer" style={{position:'absolute',top:0,left:0,right:0,height:1,background:'linear-gradient(90deg,transparent 5%,rgba(245,158,11,.75) 50%,transparent 95%)'}}/>}
-      {isTop && <div style={{position:'absolute',top:0,right:0,background:'linear-gradient(135deg,#F59E0B,#D97706)',color:'#000',fontSize:'0.57rem',fontWeight:800,padding:'2px 10px',borderBottomLeftRadius:10,letterSpacing:'0.05em'}}>AI 最优</div>}
-
-      <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:plan.isCombo?0:9}}>
-        <div style={{width:42,height:42,borderRadius:13,background:'rgba(255,255,255,.06)',border:'1px solid rgba(255,255,255,.09)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1.25rem',flexShrink:0}}>{plan.icon}</div>
-        <div style={{flex:1,minWidth:0}}>
-          <div style={{fontWeight:700,fontSize:'0.9rem',color:'#F1F5F9'}}>{plan.name}</div>
-          <div style={{fontSize:'0.64rem',color:'rgba(255,255,255,.38)',marginTop:2}}>
-            {plan.type==='hitch'?'顺风车 · 固定价':plan.type==='combo'?'组合换乘 · AI推荐':plan.type==='transit'?'公共交通':plan.type==='active'?'绿色出行':'网约车 · 动态计价'}
-          </div>
-        </div>
-        <div style={{textAlign:'right',flexShrink:0,marginRight:6}}>
-          {plan.price > 0 ? (
-            <>
-              <div style={{fontFamily:"'DM Mono'",fontSize:'1.6rem',fontWeight:700,color:plan.color,lineHeight:1}}>¥{plan.price.toFixed(1)}</div>
-              <div style={{fontSize:'0.62rem',color:'rgba(255,255,255,.32)',marginTop:2}}>{plan.minutes}min</div>
-            </>
-          ) : (
-            <div style={{fontFamily:"'DM Mono'",fontSize:'1.2rem',fontWeight:700,color:'#34D399'}}>免费</div>
-          )}
-        </div>
-        <EffRing score={plan.effScore} color={plan.color}/>
-      </div>
-
-      {plan.isCombo && plan.comboSteps && <ComboSteps steps={plan.comboSteps}/>}
-
-      <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginTop:plan.isCombo?9:0}}>
-        <div style={{display:'flex',gap:5,flexWrap:'wrap'}}>
-          <span style={{display:'inline-flex',alignItems:'center',gap:3,background:'rgba(255,255,255,.05)',border:'1px solid rgba(255,255,255,.07)',borderRadius:99,padding:'3px 8px',fontSize:'0.62rem',color:'rgba(255,255,255,.45)'}}>
-            ⏳ {plan.waitMin > 0 ? `等${plan.waitMin}min` : '即刻出发'}
-          </span>
-          {plan.type==='hitch' && <span style={{background:'rgba(16,185,129,.1)',border:'1px solid rgba(16,185,129,.22)',borderRadius:99,padding:'3px 8px',fontSize:'0.62rem',color:'#10B981'}}>🏷️ 固定价</span>}
-          {plan.type==='combo' && <span style={{background:'rgba(20,184,166,.1)',border:'1px solid rgba(20,184,166,.22)',borderRadius:99,padding:'3px 8px',fontSize:'0.62rem',color:'#14B8A6'}}>🔀 接驳</span>}
-        </div>
-        {plan.coupon && <span style={{fontSize:'0.62rem',color:plan.type==='active'||plan.type==='transit'?'rgba(255,255,255,.35)':plan.color,fontWeight:600}}>{plan.coupon}</span>}
-      </div>
-
-      {plan.url && (
-        <button onClick={e=>{e.stopPropagation();window.open(plan.url,'_blank');}}
-          style={{width:'100%',marginTop:9,padding:'9px',background:'rgba(255,255,255,.06)',border:'1px solid rgba(255,255,255,.09)',borderRadius:10,color:'rgba(241,245,249,.65)',fontSize:'0.74rem',fontWeight:600,cursor:'pointer',fontFamily:"'DM Sans'"}}>
-          🎟️ 领取优惠券 · 立即叫车 →
-        </button>
-      )}
-    </div>
-  );
+// ===================== ANALYTICS =====================
+function renderAnalytics(){
+  var mc=S.tripCount,ms=S.totalSaved,ac=S.aiChats;
+  document.getElementById('dTotalSaved').textContent='¥'+ms.toFixed(0);
+  document.getElementById('dTripCount').textContent=mc;
+  document.getElementById('dAvgSaved').textContent=mc>0?'¥'+(ms/mc).toFixed(1):'¥0';
+  document.getElementById('dAiChats').textContent=ac;
+  updSavedDisplay();
+  // Week chart
+  var wc=document.getElementById('weekChart');wc.innerHTML='';
+  var days=['日','一','二','三','四','五','六'];var mx=Math.max.apply(null,S.weekData)||1;
+  var today=new Date().getDay();
+  S.weekData.forEach(function(v,i){
+    var pct=Math.round(v/mx*80)+4;
+    var isToday=i===today;
+    var col=document.createElement('div');col.className='chart-bar-col';
+    col.innerHTML='<div class="chart-bar" style="height:'+pct+'px;background:'+(isToday?'#F59E0B':'rgba(245,158,11,.3)')+';width:100%"></div><div class="chart-bar-lbl" style="color:'+(isToday?'#F59E0B':'rgba(255,255,255,.28)')+'">'+days[i]+'</div>';
+    wc.appendChild(col);
+  });
+  // Mode chart
+  var mc2=document.getElementById('modeChart');mc2.innerHTML='<div class="sec" style="margin-bottom:10px">出行方式偏好</div>';
+  var modes=[{id:'ridehail',l:'网约车',col:'#F59E0B'},{id:'hitch',l:'顺风车',col:'#10B981'},{id:'transit',l:'公共交通',col:'#60A5FA'},{id:'active',l:'步行/单车',col:'#34D399'},{id:'combo',l:'接驳换乘',col:'#14B8A6'}];
+  var total=Object.values(S.modeUsage).reduce(function(a,b){return a+b;},0)||1;
+  modes.forEach(function(m){
+    var v=S.modeUsage[m.id]||0;var pct=Math.round(v/total*100);
+    var row=document.createElement('div');row.className='mode-row';
+    row.innerHTML='<span style="font-size:.72rem;color:rgba(255,255,255,.5);width:60px;flex-shrink:0">'+m.l+'</span>'
+      +'<div class="mode-bar-w"><div class="mode-bar" style="width:'+Math.max(pct,2)+'%;background:'+m.col+'"></div></div>'
+      +'<span style="font-size:.68rem;font-weight:700;color:'+m.col+';width:36px;text-align:right;font-variant-numeric:tabular-nums">'+pct+'%</span>';
+    mc2.appendChild(row);
+  });
+  // Insights
+  var il=document.getElementById('insightList');il.innerHTML='';
+  var c=C(),surge=getSurge();
+  var insights2=[
+    {ico:'💡',txt:ms>0?'本月通过对比，你已智能节省 ¥'+ms.toFixed(0)+'，相当于 '+Math.round(ms/9)+' 杯咖啡☕':'开始使用出行规划后，系统会自动追踪你的节省金额。'},
+    {ico:'📊',txt:mc>5?'你本月出行 '+mc+' 次，平均每次选择最优方案可省 ¥'+(ms/mc).toFixed(1)+'。':'建议尝试顺风车，固定价格在高峰/雨天能节省 15-30%。'},
+    {ico:'🔮',txt:S.timeType==='peak'?'现在是高峰期，如果能推迟 15 分钟出发，预计可省 ¥'+r1((c.base+8*c.pk+10*c.pm)*(c.sp-1))+' 以上。':'当前平峰出行，是今天叫车性价比最高的时段之一。'},
+  ];
+  insights2.forEach(function(ins){
+    var d=document.createElement('div');d.className='insight-row';
+    d.innerHTML='<span style="font-size:1.1rem;flex-shrink:0">'+ins.ico+'</span><div style="font-size:.76rem;line-height:1.72;color:rgba(255,255,255,.48)">'+ins.txt+'</div>';
+    il.appendChild(d);
+  });
+  document.getElementById('clearDataBtn').onclick=function(){if(confirm('确认清空本月数据？')){S.totalSaved=0;S.tripCount=0;S.weekData=[0,0,0,0,0,0,0];S.modeUsage={ridehail:0,hitch:0,transit:0,active:0,combo:0};sv('ss','0');sv('tc','0');sv('wd',JSON.stringify(S.weekData));sv('mu',JSON.stringify(S.modeUsage));renderAnalytics();updSavedDisplay();}};
 }
 
-function PlatformMatrix({ plans }) {
-  const rides = plans.filter(p => p.type==='ridehail').sort((a,b)=>a.price-b.price);
-  if (rides.length < 2) return null;
-  const minP = rides[0].price, maxP = rides[rides.length-1].price, range = maxP - minP || 1;
-  return (
-    <div style={{background:'rgba(255,255,255,.03)',border:'1px solid rgba(255,255,255,.07)',borderRadius:18,padding:13,marginBottom:13}}>
-      <div style={{fontSize:'0.62rem',fontWeight:700,letterSpacing:'0.1em',textTransform:'uppercase',color:'rgba(255,255,255,.3)',marginBottom:12,display:'flex',alignItems:'center',gap:7}}>
-        全网比价矩阵 <div style={{flex:1,height:1,background:'rgba(255,255,255,.06)'}}/>
-      </div>
-      {rides.map((r,i) => (
-        <div key={r.id} style={{display:'flex',alignItems:'center',gap:9,marginBottom:i<rides.length-1?8:0}}>
-          <span style={{fontSize:'1rem',width:22,textAlign:'center',flexShrink:0}}>{r.icon}</span>
-          <div style={{width:58,fontSize:'0.72rem',color:'rgba(255,255,255,.5)',flexShrink:0,fontWeight:i===0?700:400,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{r.name}</div>
-          <div style={{flex:1,height:4,background:'rgba(255,255,255,.06)',borderRadius:99,overflow:'hidden'}}>
-            <div style={{height:'100%',width:Math.round((r.price-minP)/range*65+35)+'%',background:i===0?'#10B981':r.color,borderRadius:99,transition:'width .8s cubic-bezier(.34,1.2,.64,1)'}}/>
-          </div>
-          <div style={{fontFamily:"'DM Mono'",fontSize:'0.8rem',fontWeight:700,color:i===0?'#10B981':r.color,width:46,textAlign:'right',flexShrink:0}}>¥{r.price.toFixed(1)}</div>
-          {i===0 && <span style={{background:'rgba(16,185,129,.12)',border:'1px solid rgba(16,185,129,.22)',borderRadius:99,padding:'2px 7px',fontSize:'0.57rem',fontWeight:700,color:'#10B981',flexShrink:0}}>最低</span>}
-        </div>
-      ))}
-    </div>
-  );
+// ===================== SETTINGS =====================
+function loadSettings(){S.aiEngine=ls('ae')||'demo';S.apiKey=ls('ak')||QWEN_KEY;document.getElementById('aiEngSel').value=S.aiEngine;document.getElementById('apiKeyInp').value=S.apiKey;document.getElementById('aiEngSel').value=S.aiEngine;updateKeyArea();}
+function updateKeyArea(){var show=document.getElementById('aiEngSel').value!=='demo';document.getElementById('keyInputArea').style.display=show?'block':'none';}
+function setupSettings(){
+  document.getElementById('aiEngSel').addEventListener('change',updateKeyArea);
+  document.getElementById('saveSettingsBtn').addEventListener('click',function(){
+    S.city=document.getElementById('citySelect').value;S.aiEngine=document.getElementById('aiEngSel').value;S.apiKey=document.getElementById('apiKeyInp').value.trim();
+    sv('sc',S.city);sv('ae',S.aiEngine);sv('ak',S.apiKey);
+    updCityDisplay();renderHome();alert('✅ 设置已保存');
+  });
+  document.getElementById('addFavBtn').addEventListener('click',function(){
+    if(!S.currentKm){alert('请先在出行页面搜索路线');return;}
+    var name=prompt('路线名称：');if(!name)return;
+    var favs=JSON.parse(ls('favs')||'[]');favs.unshift({name:name,from:S.currentFrom,to:S.currentTo,km:S.currentKm,city:S.city});
+    sv('favs',JSON.stringify(favs.slice(0,10)));renderFavs();alert('⭐ 已收藏');
+  });
+  renderFavs();
+}
+function renderFavs(){
+  var favs=JSON.parse(ls('favs')||'[]');var fl=document.getElementById('favList');fl.innerHTML='';
+  if(!favs.length){fl.innerHTML='<div style="font-size:.76rem;color:rgba(255,255,255,.28);padding:10px 0">暂无收藏路线。完成一次比价后可保存。</div>';return;}
+  favs.forEach(function(f,i){
+    var d=document.createElement('div');d.className='fav-item';d.style.cursor='pointer';
+    d.innerHTML='<div style="font-size:1rem">⭐</div><div style="flex:1"><div style="font-size:.82rem;font-weight:700;color:#F59E0B">'+f.name+'</div><div style="font-size:.66rem;color:rgba(255,255,255,.35);margin-top:2px">'+(f.from||'—')+' → '+(f.to||'—')+' · '+f.km+'km · '+f.city+'</div></div>'
+      +'<button style="background:none;border:none;color:rgba(255,255,255,.3);cursor:pointer;font-size:.8rem" data-idx="'+i+'">🗑</button>';
+    d.querySelector('button').addEventListener('click',function(e){e.stopPropagation();var favs2=JSON.parse(ls('favs')||'[]');favs2.splice(i,1);sv('favs',JSON.stringify(favs2));renderFavs();});
+    d.addEventListener('click',function(){
+      S.currentFrom=f.from||'';S.currentTo=f.to||'';S.currentKm=f.km;
+      document.getElementById('fromInp').value=f.from||'';document.getElementById('toInp').value=f.to||'';document.getElementById('kmInp').value=f.km;
+      switchPage('Trip');alert('✅ 路线已加载，点击搜索按钮开始分析');
+    });
+    fl.appendChild(d);
+  });
 }
 
-function DetailDrawer({ plan, onClose }) {
-  if (!plan) return null;
-  return (
-    <div style={{position:'fixed',inset:0,zIndex:300,display:'flex',alignItems:'flex-end'}}>
-      <div style={{position:'absolute',inset:0,background:'rgba(0,0,0,.72)',backdropFilter:'blur(8px)'}} onClick={onClose}/>
-      <div className="slide-up" style={{position:'relative',width:'100%',maxHeight:'78vh',overflowY:'auto',background:'#0B1727',borderRadius:'22px 22px 0 0',border:'1px solid rgba(255,255,255,.1)',borderBottom:'none',padding:'16px 15px 44px',zIndex:1}}>
-        <div style={{width:38,height:4,borderRadius:99,background:'rgba(255,255,255,.14)',margin:'0 auto 16px'}}/>
-        <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:16}}>
-          <span style={{fontSize:'1.5rem'}}>{plan.icon}</span>
-          <div style={{flex:1}}>
-            <div style={{fontWeight:800,fontSize:'1rem',color:'#F1F5F9'}}>{plan.name}</div>
-            <div style={{fontSize:'0.68rem',color:'rgba(255,255,255,.4)',marginTop:2}}>{plan.coupon}</div>
-          </div>
-          <div style={{textAlign:'right'}}>
-            <div style={{fontFamily:"'DM Mono'",fontSize:'2rem',fontWeight:700,color:plan.color,lineHeight:1}}>
-              {plan.price>0?`¥${plan.price.toFixed(1)}`:'免费'}
-            </div>
-            <div style={{fontSize:'0.65rem',color:'rgba(255,255,255,.32)',marginTop:3}}>约 {plan.minutes} 分钟</div>
-          </div>
-        </div>
-
-        <div style={{display:'flex',alignItems:'center',gap:10,background:'rgba(255,255,255,.03)',border:'1px solid rgba(255,255,255,.06)',borderRadius:12,padding:'10px 13px',marginBottom:14}}>
-          <EffRing score={plan.effScore} color={plan.color}/>
-          <div>
-            <div style={{fontSize:'0.72rem',fontWeight:700,color:plan.color}}>效率评分 {plan.effScore} / 100</div>
-            <div style={{fontSize:'0.63rem',color:'rgba(255,255,255,.35)',marginTop:2}}>综合价格、时间、舒适度加权计算</div>
-          </div>
-        </div>
-
-        {plan.isCombo && plan.comboSteps && <ComboSteps steps={plan.comboSteps}/>}
-
-        <div style={{fontSize:'0.62rem',fontWeight:700,letterSpacing:'0.1em',textTransform:'uppercase',color:'rgba(255,255,255,.28)',margin:'14px 0 9px',display:'flex',alignItems:'center',gap:7}}>
-          费用拆解 <div style={{flex:1,height:1,background:'rgba(255,255,255,.06)'}}/>
-        </div>
-
-        {plan.breakdown?.map((b,i) => (
-          <div key={i} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'8px 0',borderBottom:'1px solid rgba(255,255,255,.05)'}}>
-            <span style={{fontSize:'0.78rem',color:'rgba(255,255,255,.45)'}}>{b.label}</span>
-            <span style={{fontFamily:"'DM Mono'",fontSize:'0.78rem',fontWeight:600,color:'#F1F5F9'}}>{b.value}</span>
-          </div>
-        ))}
-
-        {plan.url && (
-          <button onClick={()=>window.open(plan.url,'_blank')}
-            style={{width:'100%',marginTop:18,padding:'15px',background:'linear-gradient(135deg,#F59E0B,#D97706)',borderRadius:14,border:'none',color:'#000',fontSize:'0.92rem',fontWeight:700,cursor:'pointer',fontFamily:"'DM Sans'",boxShadow:'0 8px 24px rgba(245,158,11,.28)'}}>
-            🎟️ 领取优惠 · 立即叫车
-          </button>
-        )}
-        <button onClick={onClose}
-          style={{width:'100%',marginTop:9,padding:'12px',background:'rgba(255,255,255,.05)',borderRadius:12,border:'1px solid rgba(255,255,255,.08)',color:'rgba(255,255,255,.4)',fontSize:'0.82rem',cursor:'pointer',fontFamily:"'DM Sans'"}}>
-          收起
-        </button>
-      </div>
-    </div>
-  );
+// ===================== DRAWERS =====================
+function openDetailDrawer(plan){
+  var r=12,circ=2*Math.PI*r,dash=(plan.eff/100)*circ;
+  var prH=plan.price>0?'¥'+plan.price.toFixed(1):'免费';
+  var comboH=plan.isCombo&&plan.steps?'<div class="combo-steps">'+plan.steps.map(function(s,si){return '<div class="cs"><div style="font-size:.95rem">'+s.ic+'</div><div style="font-size:.56rem;color:rgba(255,255,255,.36);text-align:center;line-height:1.2;max-width:60px">'+s.lb+'</div><div style="font-size:.6rem;color:#14B8A6;font-weight:600">'+(s.pr>0?'¥'+s.pr:'免费')+'</div><div style="font-size:.54rem;color:rgba(255,255,255,.26)">'+s.dur+'min</div></div>'+(si<plan.steps.length-1?'<div class="cs-line"></div>':'');}).join('')+'</div>':'';
+  openDrawer('<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">'
+    +'<div style="display:flex;align-items:center;gap:9px"><span style="font-size:1.4rem">'+plan.icon+'</span><div><div style="font-weight:800;font-size:.95rem">'+plan.name+'</div><div style="font-size:.65rem;color:rgba(255,255,255,.36);margin-top:2px">'+plan.coupon+'</div></div></div>'
+    +'<div style="text-align:right"><div style="font-size:1.9rem;font-weight:800;color:'+plan.col+';line-height:1;font-variant-numeric:tabular-nums">'+prH+'</div><div style="font-size:.6rem;color:rgba(255,255,255,.3);margin-top:2px">约 '+plan.min+' 分钟</div></div>'
+    +'</div>'
+    +'<div style="display:flex;align-items:center;gap:9px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.055);border-radius:11px;padding:9px 12px;margin-bottom:13px">'
+    +'<svg width="32" height="32" viewBox="0 0 32 32" style="transform:rotate(-90deg);flex-shrink:0"><circle cx="16" cy="16" r="'+r+'" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="2.2"/><circle cx="16" cy="16" r="'+r+'" fill="none" stroke="'+plan.col+'" stroke-width="2.2" stroke-dasharray="'+dash.toFixed(1)+' '+circ.toFixed(1)+'" stroke-linecap="round"/></svg>'
+    +'<div><div style="font-size:.7rem;font-weight:700;color:'+plan.col+'">效率评分 '+plan.eff+' / 100</div><div style="font-size:.6rem;color:rgba(255,255,255,.3);margin-top:2px">综合价格·时间·舒适度加权</div></div>'
+    +'</div>'
+    +comboH
+    +'<div class="sec" style="margin-top:13px">费用拆解</div>'
+    +(plan.bd||[]).map(function(b){return '<div class="drow"><span class="dl">'+b.l+'</span><span class="dv">'+b.v+'</span></div>';}).join('')
+    +(plan.url?'<button class="drawer-cta" onclick="window.open(\''+plan.url+'\',\'_blank\')">🎟️ 领取优惠 · 立即叫车</button>':'')
+    +'<button class="drawer-close-btn" onclick="closeDrawer()">收起</button>');
 }
 
-function SettingsDrawer({ open, onClose, city, onCity }) {
-  if (!open) return null;
-  return (
-    <div style={{position:'fixed',inset:0,zIndex:300,display:'flex',alignItems:'flex-end'}}>
-      <div style={{position:'absolute',inset:0,background:'rgba(0,0,0,.7)',backdropFilter:'blur(8px)'}} onClick={onClose}/>
-      <div className="slide-up" style={{position:'relative',width:'100%',maxHeight:'65vh',overflowY:'auto',background:'#0B1727',borderRadius:'22px 22px 0 0',border:'1px solid rgba(255,255,255,.1)',borderBottom:'none',padding:'16px 15px 44px',zIndex:1}}>
-        <div style={{width:38,height:4,borderRadius:99,background:'rgba(255,255,255,.14)',margin:'0 auto 16px'}}/>
-        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:16}}>
-          <div style={{fontWeight:700,fontSize:'0.95rem'}}>⚙️ 偏好设置</div>
-          <button onClick={onClose} style={{background:'none',border:'none',color:'rgba(255,255,255,.38)',fontSize:'1.4rem',cursor:'pointer'}}>×</button>
-        </div>
-        <div style={{marginBottom:14}}>
-          <div style={{fontSize:'0.62rem',fontFamily:"'DM Mono'",letterSpacing:'0.1em',color:'rgba(255,255,255,.3)',marginBottom:7,textTransform:'uppercase'}}>城市定价</div>
-          <select value={city} onChange={e=>onCity(e.target.value)}
-            style={{width:'100%',background:'rgba(255,255,255,.06)',border:'1px solid rgba(255,255,255,.1)',borderRadius:11,padding:'12px 13px',fontFamily:"'DM Sans'",fontSize:'0.84rem',color:'#F1F5F9',outline:'none',appearance:'none',WebkitAppearance:'none'}}>
-            {Object.keys(CITY_DB).map(c => <option key={c} value={c} style={{background:'#0B1727'}}>{c}</option>)}
-          </select>
-        </div>
-        <div style={{padding:'12px 14px',background:'rgba(245,158,11,.055)',border:'1px solid rgba(245,158,11,.15)',borderRadius:12,fontSize:'0.74rem',color:'rgba(255,255,255,.38)',lineHeight:1.7}}>
-          <strong style={{color:'#F59E0B'}}>关于定价精度：</strong><br/>
-          采用各城市真实起步价 + AI动态定价模型，最终费用以平台实际计费为准。链接含推广参数，不影响用户价格。
-        </div>
-        <button onClick={onClose}
-          style={{width:'100%',marginTop:14,padding:'12px',background:'rgba(255,255,255,.055)',borderRadius:12,border:'1px solid rgba(255,255,255,.09)',color:'rgba(255,255,255,.55)',fontSize:'0.84rem',cursor:'pointer',fontFamily:"'DM Sans'"}}>
-          保存并关闭
-        </button>
-      </div>
-    </div>
-  );
+function openHistoryDrawer(){
+  var favs=JSON.parse(ls('favs')||'[]');
+  var content='<div class="sec">收藏路线</div>';
+  if(!favs.length)content+='<div style="font-size:.78rem;color:rgba(255,255,255,.3);padding:10px 0">暂无收藏路线</div>';
+  else content+=favs.map(function(f,i){return '<div style="padding:10px 12px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.055);border-radius:11px;margin-bottom:7px;cursor:pointer" onclick="loadFavRoute('+i+')">'
+    +'<div style="font-size:.8rem;font-weight:700;color:#F59E0B;margin-bottom:3px">'+f.name+'</div>'
+    +'<div style="font-size:.65rem;color:rgba(255,255,255,.35)">'+(f.from||'—')+' → '+(f.to||'—')+' · '+f.km+'km</div>'
+    +'</div>';}).join('');
+  content+='<button class="drawer-close-btn" style="margin-top:8px" onclick="closeDrawer()">关闭</button>';
+  openDrawer(content);
+}
+function loadFavRoute(i){var favs=JSON.parse(ls('favs')||'[]');var f=favs[i];if(!f)return;S.currentFrom=f.from||'';S.currentTo=f.to||'';S.currentKm=f.km;document.getElementById('fromInp').value=f.from||'';document.getElementById('toInp').value=f.to||'';document.getElementById('kmInp').value=f.km;closeDrawer();switchPage('Trip');}
+
+function openDriverDrawer(){
+  openDrawer('<div class="sec">司机净利精算</div>'
+    +'<div style="display:flex;flex-direction:column;gap:9px">'
+    +'<input type="number" class="inp" id="drAmt" placeholder="订单金额 ¥" min="1" step="0.1">'
+    +'<input type="number" class="inp" id="drKm" placeholder="里程 km" min="0.5" step="0.5">'
+    +'<input type="number" class="inp" id="drMin" placeholder="时长 分钟" min="1">'
+    +'<div style="font-size:.62rem;color:rgba(255,255,255,.3);margin-top:2px">平台抽成</div>'
+    +'<div style="display:flex;gap:6px;flex-wrap:wrap"><button class="chip on" onclick="setDC(0.23,this)">滴滴 23%</button><button class="chip" onclick="setDC(0.20,this)">高德 20%</button><button class="chip" onclick="setDC(0.18,this)">哈啰 18%</button><button class="chip" onclick="setDC(0.15,this)">嘀嗒 15%</button></div>'
+    +'<div style="font-size:.62rem;color:rgba(255,255,255,.3);margin-top:2px">能源类型</div>'
+    +'<div style="display:flex;gap:6px;flex-wrap:wrap"><button class="chip" onclick="setDE(0.38,this)">⚡ 纯电 ¥0.38/km</button><button class="chip on" onclick="setDE(0.65,this)">⛽ 燃油 ¥0.65/km</button><button class="chip" onclick="setDE(0.48,this)">🔋 混动 ¥0.48/km</button></div>'
+    +'<button class="btn-primary" onclick="calcDriver()">🧮 开始精算</button>'
+    +'<div id="drResult" style="display:none"></div>'
+    +'</div>'
+    +'<button class="drawer-close-btn" style="margin-top:10px" onclick="closeDrawer()">关闭</button>');
+}
+var dComm=0.23,dEnergy=0.65;
+function setDC(v,btn){dComm=v;btn.parentNode.querySelectorAll('.chip').forEach(function(b){b.classList.remove('on');});btn.classList.add('on');}
+function setDE(v,btn){dEnergy=v;btn.parentNode.querySelectorAll('.chip').forEach(function(b){b.classList.remove('on');});btn.classList.add('on');}
+function calcDriver(){
+  var amt=parseFloat(document.getElementById('drAmt').value),km=parseFloat(document.getElementById('drKm').value),min=parseFloat(document.getElementById('drMin').value);
+  if(!amt||!km||!min){alert('请填写完整信息');return;}
+  var comm=amt*dComm,energy=km*dEnergy,depr=km*.15,net=amt-comm-energy-depr,hr=net/(min/60),per=net/km;
+  var rating=hr>=45?'👑 黄金肥单':hr>=20?'⛽ 正常单':'💸 公益空跑';
+  var col=hr>=45?'#F59E0B':hr>=20?'#60A5FA':'#EF4444';
+  document.getElementById('drResult').style.display='block';
+  document.getElementById('drResult').innerHTML='<div class="sec" style="margin-top:12px">精算报告</div>'
+    +'<div style="text-align:center;margin-bottom:12px"><div style="font-size:.9rem;font-weight:800;color:'+col+'">'+rating+'</div></div>'
+    +[['📦 毛收入','¥'+amt.toFixed(2),'#F1F5F9'],['🏢 平台抽成('+Math.round(dComm*100)+'%)','−¥'+comm.toFixed(2),'#EF4444'],['⛽ 能源成本','−¥'+energy.toFixed(2),'#F59E0B'],['🔧 折旧','−¥'+depr.toFixed(2),'rgba(255,255,255,.4)'],['💰 净到手','¥'+net.toFixed(2),net>0?'#10B981':'#EF4444']].map(function(r){return '<div class="drow"><span class="dl">'+r[0]+'</span><span class="dv" style="color:'+r[2]+'">'+r[1]+'</span></div>';}).join('')
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:11px">'
+    +'<div class="card" style="padding:9px;text-align:center"><div style="font-size:.58rem;color:rgba(255,255,255,.3);margin-bottom:3px">每公里净利</div><div style="font-size:1rem;font-weight:700;color:#60A5FA">¥'+per.toFixed(2)+'</div></div>'
+    +'<div class="card" style="padding:9px;text-align:center"><div style="font-size:.58rem;color:rgba(255,255,255,.3);margin-bottom:3px">折算时薪</div><div style="font-size:1rem;font-weight:700;color:'+col+'">¥'+Math.max(0,hr).toFixed(0)+'/h</div></div>'
+    +'</div>';
 }
 
-// ========== MAIN APP ==========
-function App() {
-  const [splash, setSplash] = useState(true);
-  const [from, setFrom] = useState('');
-  const [to, setTo] = useState('');
-  const [km, setKm] = useState('');
-  const [weather, setWeather] = useState('sunny');
-  const [time, setTime] = useState('normal');
-  
-  // 接入 safeStorage
-  const [city, setCity] = useState(() => safeStorage.get('sunny_city', '上海'));
-  const [phase, setPhase] = useState('input');
-  const [plans, setPlans] = useState([]);
-  const [insight, setInsight] = useState('');
-  const [insightLoading, setInsightLoading] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState(null);
-  const [totalSaved, setTotalSaved] = useState(() => parseFloat(safeStorage.get('sunny_saved', '0')));
-  const [searching, setSearching] = useState(false);
-  const [settingsOpen, setSettingsOpen] = useState(false);
-  const resultRef = useRef(null);
+function openDrawer(html){
+  var d=document.getElementById('drawer');
+  d.innerHTML='<div class="drawer-ov" id="dOv"><div class="drawer-bg" id="dBg"></div><div class="drawer-panel" onclick="event.stopPropagation()"><div class="drawer-hdl"></div>'+html+'</div></div>';
+  d.style.display='block';document.body.style.overflow='hidden';
+  document.getElementById('dBg').addEventListener('click',closeDrawer);
+}
+function closeDrawer(){document.getElementById('drawer').style.display='none';document.body.style.overflow='';}
 
-  const cd = CITY_DB[city] || DEF_CITY;
+// ===================== UTILS =====================
+function typeText(id,txt){var el=document.getElementById(id);if(!el)return;el.textContent='';var i=0;var iv=setInterval(function(){if(i<txt.length){el.textContent+=txt[i++];}else clearInterval(iv);},13);}
+function updSavedDisplay(){
+  var el=document.getElementById('sbSaved');
+  if(S.totalSaved>0.5){el.textContent='节省 ¥'+S.totalSaved.toFixed(0);el.style.display='';}
+  else el.style.display='none';
+}
+function startAutoRefresh(){setInterval(function(){detectTimeContext();renderHome();},5*60*1000);}
 
-  const cycleWeather = () => {
-    const ws = ['sunny','rain','storm'];
-    setWeather(ws[(ws.indexOf(weather)+1)%ws.length]);
-  };
-  const cycleTime = () => {
-    const ts = ['normal','peak','night'];
-    setTime(ts[(ts.indexOf(time)+1)%ts.length]);
-  };
-  const handleSwap = () => {
-    const tmp = from; setFrom(to); setTo(tmp);
-  };
-  const handleKmSelect = v => setKm(String(v));
-
-  const handleSearch = () => {
-    const kmV = parseFloat(km);
-    if (!kmV || kmV < 0.5) { alert('请输入有效的行程距离（≥0.5km）'); return; }
-    setSearching(true);
-    setTimeout(() => {
-      const newPlans = generatePlans(kmV, cd, weather, time);
-      setPlans(newPlans);
-      setPhase('results');
-      setSearching(false);
-      setInsight('');
-      setInsightLoading(true);
-
-      const rides = newPlans.filter(p=>p.type==='ridehail').sort((a,b)=>a.price-b.price);
-      const hitch = newPlans.find(p=>p.type==='hitch');
-      if (rides.length && hitch) {
-        const saving = Math.max(0, rides[rides.length-1].price - hitch.price);
-        if (saving > 0) {
-          const ns = totalSaved + saving;
-          setTotalSaved(ns);
-          safeStorage.set('sunny_saved', ns.toFixed(2));
-        }
-      }
-      setTimeout(() => {
-        setInsightLoading(false);
-        setInsight(getSunnyInsight(kmV, weather, time, cd, newPlans, city));
-      }, 650);
-      setTimeout(() => resultRef.current?.scrollIntoView({behavior:'smooth'}), 180);
-    }, 850);
-  };
-
-  const handleCityChange = c => {
-    setCity(c);
-    safeStorage.set('sunny_city', c);
-  };
-
-  if (splash) return <Splash onDone={() => setSplash(false)}/>;
-
-  const ridesSorted = plans.filter(p=>p.type==='ridehail').sort((a,b)=>a.price-b.price);
-  const hitchPlan = plans.find(p=>p.type==='hitch');
-  const maxSaving = ridesSorted.length && hitchPlan ? r1(ridesSorted[ridesSorted.length-1].price - hitchPlan.price) : 0;
-
-  return (
-    <div style={{maxWidth:480,margin:'0 auto',padding:'0 13px 88px',position:'relative',zIndex:1}}>
-      <Header city={city} totalSaved={totalSaved} onSettings={()=>setSettingsOpen(true)}/>
-
-      {phase === 'input' && (
-        <div className="fade-in">
-          <div style={{background:'rgba(255,255,255,.04)',backdropFilter:'blur(20px)',border:'1px solid rgba(255,255,255,.08)',borderRadius:20,padding:15,marginBottom:13}}>
-            <div style={{fontSize:'0.62rem',fontWeight:700,letterSpacing:'0.1em',textTransform:'uppercase',color:'rgba(255,255,255,.3)',marginBottom:12,display:'flex',alignItems:'center',gap:7}}>
-              行程规划 <div style={{flex:1,height:1,background:'rgba(255,255,255,.06)'}}/>
-            </div>
-            <ContextChips weather={weather} time={time} onWeather={cycleWeather} onTime={cycleTime}/>
-            <LocationInput from={from} to={to} onFrom={setFrom} onTo={setTo} onSwap={handleSwap}/>
-            
-            {/* 修复了原代码中在此处重复写了两次 letterSpacing 的冗余 */}
-            <div style={{fontSize:'0.62rem',fontFamily:"'DM Mono'",color:'rgba(255,255,255,.28)',marginBottom:8,textTransform:'uppercase',letterSpacing:'0.1em'}}>快速选距</div>
-            
-            <QuickDist onSelect={handleKmSelect}/>
-            <div style={{position:'relative',marginBottom:14}}>
-              <span style={{position:'absolute',left:13,top:'50%',transform:'translateY(-50%)',fontSize:'0.88rem',color:'rgba(255,255,255,.3)',pointerEvents:'none'}}>🛣️</span>
-              <input type="number" value={km} onChange={e=>setKm(e.target.value)}
-                placeholder="行程距离 km" min="0.5" max="300" step="0.5"
-                style={{width:'100%',background:'rgba(255,255,255,.055)',border:'1px solid rgba(255,255,255,.09)',borderRadius:12,padding:'12px 12px 12px 36px',fontFamily:"'DM Mono'",fontSize:'0.9rem',color:'#F1F5F9',transition:'border-color .2s'}}
-                onFocus={e=>e.target.style.borderColor='rgba(245,158,11,.4)'}
-                onBlur={e=>e.target.style.borderColor='rgba(255,255,255,.09)'}
-              />
-            </div>
-            <button onClick={handleSearch} disabled={searching}
-              style={{width:'100%',padding:'15px',borderRadius:14,border:'none',background:searching?'rgba(245,158,11,.35)':'linear-gradient(135deg,#F59E0B,#D97706)',color:'#000',fontFamily:"'DM Sans'",fontSize:'0.94rem',fontWeight:700,cursor:searching?'not-allowed':'pointer',boxShadow:searching?'none':'0 8px 26px rgba(245,158,11,.28)',transition:'all .2s',display:'flex',alignItems:'center',justifyContent:'center',gap:9}}>
-              {searching ? (
-                <>
-                  <div style={{width:16,height:16,border:'2px solid rgba(0,0,0,.25)',borderTopColor:'#000',borderRadius:'50%',animation:'spin .7s linear infinite'}}/>
-                  分析出行方案中…
-                </>
-              ) : '✦ 智能分析出行方案'}
-            </button>
-          </div>
-
-          <div style={{padding:'12px 14px',background:'rgba(99,102,241,.05)',border:'1px solid rgba(99,102,241,.15)',borderRadius:14,fontSize:'0.74rem',color:'rgba(255,255,255,.38)',lineHeight:1.72}}>
-            <strong style={{color:'#818CF8'}}>💡 智能过滤：</strong>距离 &gt;15km 自动隐藏共享单车，&lt;2km 优先推荐步行。超过10km 生成接驳换乘方案节省更多。
-          </div>
-        </div>
-      )}
-
-      {phase === 'results' && (
-        <div className="fade-in">
-          <div ref={resultRef}/>
-          <button onClick={()=>{setPhase('input');setPlans([]);setInsight('');}}
-            style={{display:'inline-flex',alignItems:'center',gap:6,marginBottom:13,background:'rgba(255,255,255,.05)',border:'1px solid rgba(255,255,255,.09)',borderRadius:99,padding:'7px 14px',color:'rgba(255,255,255,.55)',fontSize:'0.75rem',cursor:'pointer',fontFamily:"'DM Sans'"}}>
-            ← 重新规划
-          </button>
-
-          <div style={{display:'flex',gap:5,marginBottom:12,flexWrap:'wrap'}}>
-            {[
-              from && `🟢 ${from}`,
-              to && `🔴 ${to}`,
-              `${WEATHER_META[weather].icon} ${WEATHER_META[weather].label}`,
-              `${TIME_META[time].icon}
+// ===================== EXPOSE GLOBALS =====================
+window.closeDrawer=closeDrawer;window.loadFavRoute=loadFavRoute;window.setDC=setDC;window.setDE=setDE;window.calcDriver=calcDriver;
+</script>
+</body>
+</html>
