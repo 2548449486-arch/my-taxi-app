@@ -334,36 +334,55 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
         <div class="card" style="padding:14px;margin-bottom:11px">
           <div class="sec">行程规划</div>
           <div class="ctx-chips" id="tripCtxChips"></div>
-          <div style="display:flex;gap:7px;align-items:center;margin-bottom:11px">
-            <button id="gpsBtn" style="display:flex;align-items:center;gap:6px;background:rgba(20,184,166,.08);border:1px solid rgba(20,184,166,.2);border-radius:10px;padding:8px 12px;color:#14B8A6;font-size:.72rem;font-weight:600;cursor:pointer;flex-shrink:0;-webkit-appearance:none">
-              <span>📡</span><span id="gpsBtnTxt">获取定位</span>
-            </button>
-            <div style="font-size:.62rem;color:rgba(255,255,255,.3);line-height:1.4" id="gpsStatus">点击获取当前位置（高德逆地理编码）</div>
+
+          <!-- GPS 状态栏（自动定位，无需点击） -->
+          <div id="gpsStatusBar" style="display:flex;align-items:center;gap:8px;margin-bottom:11px;padding:8px 11px;background:rgba(20,184,166,.06);border:1px solid rgba(20,184,166,.15);border-radius:10px">
+            <span id="gpsStatusIco" style="font-size:1rem;flex-shrink:0">📡</span>
+            <div style="flex:1;font-size:.65rem;color:rgba(255,255,255,.45);line-height:1.4" id="gpsStatus">正在获取精确位置…</div>
+            <button id="retryGpsBtn" style="-webkit-appearance:none;border:none;background:rgba(20,184,166,.15);border-radius:6px;padding:3px 9px;font-size:.6rem;color:#14B8A6;cursor:pointer;flex-shrink:0">重试</button>
           </div>
+
+          <!-- 起终点输入 -->
           <div class="loc-wrap">
             <div class="loc-from">
               <div class="loc-dot" style="background:#10B981;box-shadow:0 0 6px #10B981"></div>
-              <input type="text" class="loc-inp" id="fromInp" placeholder="出发地（高德地名搜索）" autocomplete="off">
+              <input type="text" class="loc-inp" id="fromInp" placeholder="出发地（GPS自动填写）" autocomplete="off" readonly>
               <div class="sugg" id="fromSugg" style="display:none"></div>
             </div>
             <div class="loc-conn"></div>
             <button class="swap-btn" id="swapBtn">⇅</button>
             <div class="loc-to">
               <div class="loc-sq" style="background:#EF4444;box-shadow:0 0 6px #EF4444"></div>
-              <input type="text" class="loc-inp" id="toInp" placeholder="目的地（高德地名搜索）" autocomplete="off">
+              <input type="text" class="loc-inp" id="toInp" placeholder="输入目的地，自动规划路线 →" autocomplete="off">
               <div class="sugg" id="toSugg" style="display:none"></div>
             </div>
           </div>
-          <button class="smart-dist-btn" id="autoDistBtn">🗺️ <span id="autoDistBtnTxt">智能测距（填写起终点后点击，高德驾车路线）</span></button>
-          <div class="sec">快速选距</div>
-          <div class="qdist" id="qdistRow"></div>
-          <div class="km-wrap">
-            <span class="km-ico">🛣️</span>
-            <input type="number" class="km-inp" id="kmInp" placeholder="行程距离 km（可手动输入）" min="0.5" max="300" step="0.5">
+
+          <!-- 路线状态卡（自动出现） -->
+          <div id="routeCard" style="display:none;margin-top:10px;padding:11px 13px;background:rgba(20,184,166,.07);border:1px solid rgba(20,184,166,.22);border-radius:12px">
+            <div style="display:flex;align-items:center;gap:8px">
+              <span id="routeCardIco" style="font-size:1.1rem;flex-shrink:0">🗺️</span>
+              <div style="flex:1">
+                <div style="font-size:.78rem;font-weight:700;color:#14B8A6" id="routeCardMain">规划中…</div>
+                <div style="font-size:.6rem;color:rgba(255,255,255,.3);margin-top:2px" id="routeCardSub"></div>
+              </div>
+              <div id="routeCardSpinner" style="display:none"><div class="spin-sm" style="border-top-color:#14B8A6"></div></div>
+            </div>
           </div>
-          <button class="btn-primary" id="searchBtn">✦ AI 智能分析出行方案</button>
+
+          <!-- 手动兜底（隐藏，仅在路线规划失败时出现） -->
+          <div id="manualDistRow" style="display:none;margin-top:10px">
+            <div class="sec" style="margin-bottom:8px">手动选距（路线规划失败时使用）</div>
+            <div class="qdist" id="qdistRow"></div>
+            <div class="km-wrap">
+              <span class="km-ico">🛣️</span>
+              <input type="number" class="km-inp" id="kmInp" placeholder="行程距离 km" min="0.5" max="300" step="0.5">
+            </div>
+          </div>
+
+          <button class="btn-primary" id="searchBtn" style="margin-top:12px;display:none">✦ AI 智能分析出行方案</button>
         </div>
-        <div class="hint"><strong>💡 智能过滤：</strong>&gt;15km 隐藏单车 · &lt;2km 优先步行 · &gt;10km 接驳换乘 · 雨天自动过滤骑行</div>
+        <div class="hint"><strong>💡 全自动流程：</strong>GPS定位出发地 → 输入目的地 → 高德自动测距 → AI方案秒出</div>
       </div>
 
       <div id="tripResults" style="display:none">
@@ -530,7 +549,9 @@ var S={
   weekData:JSON.parse(ls('wd')||'[0,0,0,0,0,0,0]'),
   modeUsage:JSON.parse(ls('mu')||'{"ridehail":0,"hitch":0,"transit":0,"active":0,"combo":0}'),
   adcode:'',temperature:'',humidity:'',windpower:'',winddirection:'',
-  realWeatherDesc:'',lastWeatherUpdate:''
+  realWeatherDesc:'',lastWeatherUpdate:'',
+  // GPS & route auto-flow
+  gpsLat:0,gpsLng:0,destLoc:'',routeKm:0,routeDrivMin:0
 };
 function ls(k){try{return localStorage.getItem(k);}catch(e){return null;}}
 function sv(k,v){try{localStorage.setItem(k,v);}catch(e){}}
@@ -620,7 +641,7 @@ function renderWeatherMeta(){
   t.style.background='rgba(0,0,0,.15)';t.style.border='1px solid '+rc.col+'55';
 }
 
-// ===== LOCATION =====
+// ===== LOCATION (IP fallback for weather/city) =====
 function getLocation(){
   amapJsonp(AMAP+'/ip',{}).then(function(d){
     if(d.status==='1'){
@@ -633,30 +654,83 @@ function getLocation(){
   }).catch(function(){var a=CITY_ADCODE[S.city]||'310000';S.adcode=a;fetchRealWeather(a);});
 }
 
-async function doGPS(){
-  document.getElementById('gpsBtnTxt').textContent='定位中…';
-  document.getElementById('gpsStatus').textContent='正在获取 GPS 位置…';
-  if(!navigator.geolocation){document.getElementById('gpsStatus').textContent='设备不支持 GPS';document.getElementById('gpsBtnTxt').textContent='获取定位';return;}
-  navigator.geolocation.getCurrentPosition(async function(pos){
-    var lng=pos.coords.longitude.toFixed(6),lat=pos.coords.latitude.toFixed(6),acc=Math.round(pos.coords.accuracy);
-    document.getElementById('gpsBtnTxt').textContent='解析中…';
-    try{
-      var d=await amapJsonp(AMAP+'/geocode/regeo',{location:lng+','+lat,extensions:'base',radius:'100'});
-      if(d.status==='1'&&d.regeocode){
-        var addr=d.regeocode.formatted_address||'';
-        document.getElementById('fromInp').value=addr;
-        document.getElementById('gpsStatus').textContent='📡 '+(addr.length>22?addr.slice(0,22)+'…':addr)+' ±'+acc+'m';
-        var comp=d.regeocode.addressComponent;
-        if(comp){
-          if(comp.adcode){S.adcode=comp.adcode;fetchRealWeather(comp.adcode);}
-          var cn=((comp.city||comp.province)||'').replace(/市|省/g,'');
-          var m=cn&&Object.keys(CITY_DB).find(function(k){return cn===k||cn.indexOf(k)>=0||k.indexOf(cn)>=0;});
-          if(m&&m!==S.city){S.city=m;sv('sc',m);updCityDisplay();renderHome();}
+// ===== AUTO GPS (watchPosition for best accuracy) =====
+var _gpsWatchId=null,_gpsBestAcc=9999,_gpsResolvedAddr='';
+function autoStartGPS(){
+  setGpsStatus('📡','正在获取精确位置…','rgba(255,255,255,.35)');
+  if(!navigator.geolocation){
+    setGpsStatus('⚠️','设备不支持定位，请手动输入目的地','#F59E0B');
+    enableManualFrom();return;
+  }
+  // watchPosition: keeps updating as GPS chip locks on
+  _gpsWatchId=navigator.geolocation.watchPosition(
+    function(pos){
+      var acc=Math.round(pos.coords.accuracy);
+      if(acc>=_gpsBestAcc&&_gpsBestAcc<200)return; // already got better fix
+      _gpsBestAcc=acc;
+      S.gpsLat=pos.coords.latitude;S.gpsLng=pos.coords.longitude;
+      setGpsStatus('📡','GPS ±'+acc+'m · 解析地址中…','rgba(255,255,255,.35)');
+      // Regeocode with Amap JSONP
+      amapJsonp(AMAP+'/geocode/regeo',{
+        location:pos.coords.longitude.toFixed(6)+','+pos.coords.latitude.toFixed(6),
+        extensions:'base',radius:'50'
+      }).then(function(d){
+        if(d.status==='1'&&d.regeocode){
+          var addr=d.regeocode.formatted_address||'';
+          // Strip province/city prefix, keep district+street level
+          addr=addr.replace(/^[一-龥]{2,4}省|^[一-龥]{2,4}市/,'');
+          if(!addr)addr='当前位置 ('+S.city+')';
+          _gpsResolvedAddr=addr;
+          var fromInp=document.getElementById('fromInp');
+          fromInp.value=addr;fromInp.removeAttribute('readonly');
+          setGpsStatus('✅',addr.length>20?addr.slice(0,20)+'… ±'+acc+'m':'±'+acc+'m 已定位','#10B981');
+          var comp=d.regeocode.addressComponent;
+          if(comp){
+            if(comp.adcode){S.adcode=comp.adcode;fetchRealWeather(comp.adcode);}
+            var cn=((comp.city||comp.province)||'').replace(/市|省/g,'');
+            var m=cn&&Object.keys(CITY_DB).find(function(k){return cn===k||cn.indexOf(k)>=0||k.indexOf(cn)>=0;});
+            if(m&&m!==S.city){S.city=m;sv('sc',m);updCityDisplay();renderHome();}
+          }
+          // Stop watching once accuracy is good enough
+          if(acc<=80&&_gpsWatchId!==null){navigator.geolocation.clearWatch(_gpsWatchId);_gpsWatchId=null;}
+          // If destination already filled, auto-route
+          var toVal=document.getElementById('toInp').value.trim();
+          if(toVal&&S.currentTo===toVal)calcRouteAuto();
         }
-      }else{document.getElementById('fromInp').value='当前位置 ('+S.city+')';document.getElementById('gpsStatus').textContent='📡 GPS ±'+acc+'m';}
-    }catch(e){document.getElementById('fromInp').value='当前位置 ('+S.city+')';document.getElementById('gpsStatus').textContent='📡 GPS ±'+acc+'m（地址解析失败）';}
-    document.getElementById('gpsBtnTxt').textContent='重新定位';
-  },function(err){document.getElementById('gpsBtnTxt').textContent='获取定位';document.getElementById('gpsStatus').textContent='定位失败（错误'+err.code+'），请手动输入';},{timeout:9000,enableHighAccuracy:true});
+      }).catch(function(){
+        if(!_gpsResolvedAddr){
+          document.getElementById('fromInp').removeAttribute('readonly');
+          document.getElementById('fromInp').value='当前位置 ('+S.city+')';
+          setGpsStatus('📡','±'+acc+'m（地址解析中）','rgba(255,255,255,.35)');
+        }
+      });
+    },
+    function(err){
+      if(_gpsWatchId!==null){navigator.geolocation.clearWatch(_gpsWatchId);_gpsWatchId=null;}
+      var msg=err.code===1?'定位权限被拒绝，请在浏览器设置中允许':err.code===3?'定位超时，请重试':'定位失败，请手动输入';
+      setGpsStatus('⚠️',msg,'#F59E0B');
+      enableManualFrom();
+    },
+    {enableHighAccuracy:true,timeout:15000,maximumAge:0}
+  );
+  // Stop watching after 20s regardless
+  setTimeout(function(){
+    if(_gpsWatchId!==null){navigator.geolocation.clearWatch(_gpsWatchId);_gpsWatchId=null;}
+    if(!_gpsResolvedAddr){setGpsStatus('⚠️','定位超时，请手动输入出发地或重试','#F59E0B');enableManualFrom();}
+  },20000);
+}
+function setGpsStatus(ico,txt,col){
+  document.getElementById('gpsStatusIco').textContent=ico;
+  var el=document.getElementById('gpsStatus');el.textContent=txt;el.style.color=col||'rgba(255,255,255,.35)';
+}
+function enableManualFrom(){
+  var inp=document.getElementById('fromInp');inp.removeAttribute('readonly');inp.placeholder='手动输入出发地';
+}
+function retryGPS(){
+  _gpsBestAcc=9999;_gpsResolvedAddr='';
+  if(_gpsWatchId!==null){navigator.geolocation.clearWatch(_gpsWatchId);_gpsWatchId=null;}
+  document.getElementById('fromInp').value='';
+  autoStartGPS();
 }
 
 // ===== POI SEARCH =====
@@ -673,36 +747,74 @@ async function fetchAmapPOI(q,city){
   return[];
 }
 
-// ===== SMART DISTANCE =====
-async function calcAutoDistance(){
-  var fromV=document.getElementById('fromInp').value.trim(),toV=document.getElementById('toInp').value.trim();
-  if(!fromV||!toV){alert('请先填写出发地和目的地');return;}
-  var btn=document.getElementById('autoDistBtn');btn.disabled=true;
-  document.getElementById('autoDistBtnTxt').innerHTML='<span class="spin-sm"></span>测距中，正在调用高德驾车路线…';
+// ===== AUTO ROUTE CALCULATION =====
+// Called automatically when destination is selected
+async function calcRouteAuto(){
+  var fromV=document.getElementById('fromInp').value.trim();
+  var toV=document.getElementById('toInp').value.trim();
+  if(!fromV||!toV)return;
+  // Show route card loading
+  var rc=document.getElementById('routeCard');
+  rc.style.display='block';
+  document.getElementById('routeCardSpinner').style.display='block';
+  document.getElementById('routeCardIco').textContent='🗺️';
+  document.getElementById('routeCardMain').textContent='规划驾车路线中…';
+  document.getElementById('routeCardSub').textContent=fromV.slice(0,14)+'… → '+toV.slice(0,14)+'…';
+  document.getElementById('searchBtn').style.display='none';
   try{
-    var dg1=await amapJsonp(AMAP+'/geocode/geo',{address:fromV,city:S.city});
-    if(!dg1.geocodes||!dg1.geocodes[0])throw new Error('起点地址无法识别');
-    var dg2=await amapJsonp(AMAP+'/geocode/geo',{address:toV,city:S.city});
-    if(!dg2.geocodes||!dg2.geocodes[0])throw new Error('终点地址无法识别');
-    var origin=dg1.geocodes[0].location,dest=dg2.geocodes[0].location;
-    var dr=await amapJsonp(AMAP+'/direction/driving',{origin:origin,destination:dest,strategy:'0',extensions:'base'});
+    // Use GPS coords for origin if available (more precise than geocoding address)
+    var originCoord;
+    if(S.gpsLat&&S.gpsLng){
+      originCoord=S.gpsLng.toFixed(6)+','+S.gpsLat.toFixed(6);
+    }else{
+      var dg1=await amapJsonp(AMAP+'/geocode/geo',{address:fromV,city:S.city});
+      if(!dg1.geocodes||!dg1.geocodes[0])throw new Error('起点地址无法识别');
+      originCoord=dg1.geocodes[0].location;
+    }
+    // Use stored dest POI location or geocode
+    var destCoord;
+    if(S.destLoc){
+      destCoord=S.destLoc;
+    }else{
+      var dg2=await amapJsonp(AMAP+'/geocode/geo',{address:toV,city:S.city});
+      if(!dg2.geocodes||!dg2.geocodes[0])throw new Error('终点地址无法识别');
+      destCoord=dg2.geocodes[0].location;
+    }
+    var dr=await amapJsonp(AMAP+'/direction/driving',{origin:originCoord,destination:destCoord,strategy:'0',extensions:'base'});
     if(dr.status==='1'&&dr.route&&dr.route.paths&&dr.route.paths[0]){
       var path=dr.route.paths[0];
       var km=Math.round(parseInt(path.distance)/100)/10;
       var drivMin=Math.round(parseInt(path.duration)/60);
       var toll=parseInt(path.tolls||0);
+      S.routeKm=km;S.routeDrivMin=drivMin;
       document.getElementById('kmInp').value=km;
-      var trafficHint=S.timeType==='peak'?'高峰预计+'+Math.round(drivMin*.3)+'min':'路况正常';
+      var trafficHint=S.timeType==='peak'?'高峰预计约'+(drivMin+Math.round(drivMin*.3))+'min':drivMin+'min';
       var tollStr=toll>0?' · 过路费约¥'+toll:'';
-      document.getElementById('autoDistBtnTxt').textContent='✅ 驾车 '+km+'km · 约'+drivMin+'min · '+trafficHint+tollStr;
-      document.getElementById('autoDistBtnTxt').style.color='#10B981';
-    }else{throw new Error('路线规划失败，请检查地址');}
+      // Update route card — success
+      document.getElementById('routeCardSpinner').style.display='none';
+      document.getElementById('routeCardIco').textContent='✅';
+      document.getElementById('routeCardMain').textContent='驾车 '+km+'km · '+trafficHint+tollStr;
+      document.getElementById('routeCardSub').textContent='路线已规划 · AI正在分析最优出行方案';
+      document.getElementById('routeCardMain').style.color='#10B981';
+      // Show & flash search button
+      var sb=document.getElementById('searchBtn');
+      sb.style.display='flex';
+      sb.innerHTML='✦ AI 智能分析出行方案（'+km+'km）';
+      // Auto-trigger search after 1.2s
+      clearTimeout(window._autoSearchTimer);
+      window._autoSearchTimer=setTimeout(function(){doSearch(km);},1200);
+    }else{throw new Error('路线规划失败');}
   }catch(e){
-    document.getElementById('autoDistBtnTxt').textContent='⚠️ '+e.message+'，请手动输入距离';
-    document.getElementById('autoDistBtnTxt').style.color='#EF4444';
-    setTimeout(function(){document.getElementById('autoDistBtnTxt').textContent='🗺️ 智能测距（填写起终点后点击）';document.getElementById('autoDistBtnTxt').style.color='';},4000);
+    document.getElementById('routeCardSpinner').style.display='none';
+    document.getElementById('routeCardIco').textContent='⚠️';
+    document.getElementById('routeCardMain').textContent='路线规划失败：'+e.message;
+    document.getElementById('routeCardMain').style.color='#EF4444';
+    document.getElementById('routeCardSub').textContent='已显示手动输入选项';
+    // Show manual fallback
+    document.getElementById('manualDistRow').style.display='block';
+    document.getElementById('searchBtn').style.display='flex';
+    document.getElementById('searchBtn').innerHTML='✦ AI 智能分析出行方案';
   }
-  btn.disabled=false;
 }
 
 // ===== SPLASH =====
@@ -716,8 +828,11 @@ function bootApp(){
   initClock();detectTimeContext();buildUI();loadSettings();
   renderHome();renderAnalytics();
   setupNav();setupTrip();setupChat();setupSettings();startAutoRefresh();
+  // IP location for weather/city (fast)
   setTimeout(getLocation,400);
-  setTimeout(function(){if(!S.realWeatherDesc){var a=CITY_ADCODE[S.city]||'310000';S.adcode=a;fetchRealWeather(a);}},3000);
+  setTimeout(function(){if(!S.realWeatherDesc){var a=CITY_ADCODE[S.city]||'310000';S.adcode=a;fetchRealWeather(a);}},3500);
+  // GPS auto-start for precise from address (asks permission once)
+  setTimeout(autoStartGPS,800);
   document.getElementById('refreshWeatherBtn').addEventListener('click',function(){fetchRealWeather(S.adcode||CITY_ADCODE[S.city]||'310000');});
 }
 function initClock(){function tick(){var d=new Date(),h=d.getHours(),m=d.getMinutes();document.getElementById('sbTime').textContent=(h<10?'0':'')+h+':'+(m<10?'0':'')+m;}tick();setInterval(tick,30000);}
@@ -790,7 +905,7 @@ function buildUI(){
   var sel=document.getElementById('citySelect');
   if(sel){Object.keys(CITY_DB).forEach(function(c){var o=document.createElement('option');o.value=c;o.textContent=c;if(c===S.city)o.selected=true;sel.appendChild(o);});}
   var qd=document.getElementById('qdistRow');
-  if(qd){[2,5,10,20,35].forEach(function(dist){var b=document.createElement('button');b.className='qd';b.textContent=dist+'km';b.addEventListener('click',function(){document.getElementById('kmInp').value=dist;});qd.appendChild(b);});var cu=document.createElement('button');cu.className='qd';cu.textContent='自定义';cu.addEventListener('click',function(){var v=prompt('输入距离（km）：');if(v&&!isNaN(parseFloat(v))&&parseFloat(v)>0)document.getElementById('kmInp').value=parseFloat(v);});qd.appendChild(cu);}
+  if(qd){[2,5,10,20,35].forEach(function(dist){var b=document.createElement('button');b.className='qd';b.textContent=dist+'km';b.addEventListener('click',function(){document.getElementById('kmInp').value=dist;S.routeKm=dist;document.getElementById('searchBtn').style.display='flex';document.getElementById('searchBtn').innerHTML='✦ AI 智能分析出行方案（'+dist+'km）';});qd.appendChild(b);});var cu=document.createElement('button');cu.className='qd';cu.textContent='自定义';cu.addEventListener('click',function(){var v=prompt('输入距离（km）：');if(v&&!isNaN(parseFloat(v))&&parseFloat(v)>0){document.getElementById('kmInp').value=parseFloat(v);S.routeKm=parseFloat(v);document.getElementById('searchBtn').style.display='flex';}});qd.appendChild(cu);}
   var qChips=document.getElementById('qChips');
   if(qChips)['现在怎么出行最省？','高峰期有什么建议？','如何叫到最便宜的车？','雨天出行攻略','顺风车 vs 网约车','地铁还是打车？'].forEach(function(q){var b=document.createElement('button');b.className='q-chip';b.textContent=q;b.addEventListener('click',function(){sendChat(q);});qChips.appendChild(b);});
   renderTripChips();
@@ -826,30 +941,99 @@ function renderTripChips(){
   ch.appendChild(bw);ch.appendChild(bt);
 }
 function setupTrip(){
-  document.getElementById('searchBtn').addEventListener('click',doSearch);
-  document.getElementById('tripBackBtn').addEventListener('click',function(){document.getElementById('tripInput').style.display='block';document.getElementById('tripResults').style.display='none';});
-  document.getElementById('swapBtn').addEventListener('click',function(){var f=document.getElementById('fromInp'),t=document.getElementById('toInp'),tmp=f.value;f.value=t.value;t.value=tmp;});
-  document.getElementById('gpsBtn').addEventListener('click',doGPS);
-  document.getElementById('autoDistBtn').addEventListener('click',calcAutoDistance);
-  setupLocInp('fromInp','fromSugg');setupLocInp('toInp','toSugg');
+  document.getElementById('searchBtn').addEventListener('click',function(){doSearch(S.routeKm||parseFloat(document.getElementById('kmInp').value));});
+  document.getElementById('tripBackBtn').addEventListener('click',function(){
+    document.getElementById('tripInput').style.display='block';
+    document.getElementById('tripResults').style.display='none';
+    // Reset route card for re-planning
+    document.getElementById('routeCard').style.display='none';
+    document.getElementById('searchBtn').style.display='none';
+    document.getElementById('manualDistRow').style.display='none';
+    S.routeKm=0;S.destLoc='';S.currentTo='';
+    document.getElementById('toInp').value='';
+    document.getElementById('routeCardMain').style.color='#14B8A6';
+  });
+  document.getElementById('swapBtn').addEventListener('click',function(){
+    var f=document.getElementById('fromInp'),t=document.getElementById('toInp'),tmp=f.value;
+    f.value=t.value;t.value=tmp;
+    // Swap GPS coords too
+    var tmpLat=S.gpsLat,tmpLng=S.gpsLng;
+    if(S.destLoc){var parts=S.destLoc.split(',');S.gpsLng=parseFloat(parts[0]);S.gpsLat=parseFloat(parts[1]);}
+    S.destLoc=tmpLat&&tmpLng?(tmpLng.toFixed(6)+','+tmpLat.toFixed(6)):'';
+    // Re-calculate after swap
+    if(f.value&&t.value)setTimeout(calcRouteAuto,300);
+  });
+  document.getElementById('retryGpsBtn').addEventListener('click',retryGPS);
+  // fromInp: allow manual edit (unlocked after GPS fails or user taps)
+  document.getElementById('fromInp').addEventListener('click',function(){this.removeAttribute('readonly');});
+  document.getElementById('fromInp').addEventListener('input',function(){
+    S.gpsLat=0;S.gpsLng=0; // clear GPS coords when manually edited
+    var v=this.value.trim();
+    var box=document.getElementById('fromSugg'),tmr=null;
+    showLocalSugg(this,box,v);
+    if(v.length>=1)setTimeout(async function(){var pois=await fetchAmapPOI(v,S.city);if(pois.length)renderSuggFrom(pois);},380);
+  });
+  document.getElementById('fromInp').addEventListener('blur',function(){setTimeout(function(){document.getElementById('fromSugg').style.display='none';},240);});
+  // toInp: main interaction
+  setupLocInpTo();
 }
-function setupLocInp(inpId,suggId){
-  var inp=document.getElementById(inpId),box=document.getElementById(suggId),tmr=null;
+
+function setupLocInpTo(){
+  var inp=document.getElementById('toInp'),box=document.getElementById('toSugg'),tmr=null;
   inp.addEventListener('input',function(){
     clearTimeout(tmr);var v=inp.value.trim();
+    S.destLoc='';// clear stored dest coords when user types
     showLocalSugg(inp,box,v);
-    if(v.length>=1)tmr=setTimeout(async function(){var pois=await fetchAmapPOI(v,S.city);if(pois.length&&(document.activeElement===inp||box.style.display==='block'))renderSugg(inp,box,pois);},380);
+    if(v.length>=1)tmr=setTimeout(async function(){
+      var pois=await fetchAmapPOI(v,S.city);
+      if(pois.length&&(document.activeElement===inp||box.style.display==='block'))renderSuggTo(inp,box,pois);
+    },350);
   });
   inp.addEventListener('focus',function(){showLocalSugg(inp,box,inp.value.trim());});
   inp.addEventListener('blur',function(){setTimeout(function(){box.style.display='none';},240);});
 }
-function showLocalSugg(inp,box,v){var list=v?PLACES.filter(function(p){return p.toLowerCase().indexOf(v.toLowerCase())>=0;}).slice(0,5):PLACES.slice(0,6);renderSugg(inp,box,list.map(function(p){return{name:p,address:''};}));}
-function renderSugg(inp,box,items){
-  if(!items||!items.length){box.style.display='none';return;}
-  box.innerHTML=items.map(function(item){return'<div class="sugg-i"><div>📍 '+item.name+'</div>'+(item.address?'<div class="sugg-addr">'+item.address.slice(0,32)+(item.address.length>32?'…':'')+'</div>':'')+'</div>';}).join('');
-  box.querySelectorAll('.sugg-i').forEach(function(el,i){function pick(){inp.value=items[i].name;box.style.display='none';}el.addEventListener('mousedown',function(e){e.preventDefault();pick();});el.addEventListener('touchstart',function(e){e.preventDefault();pick();},{passive:false});});
+
+function renderSuggFrom(pois){
+  var inp=document.getElementById('fromInp'),box=document.getElementById('fromSugg');
+  renderSuggGeneric(inp,box,pois,function(item){
+    inp.value=item.name;
+    S.gpsLat=0;S.gpsLng=0;
+    if(item.location){var p=item.location.split(',');S.gpsLng=parseFloat(p[0]);S.gpsLat=parseFloat(p[1]);}
+    box.style.display='none';
+    if(document.getElementById('toInp').value.trim())calcRouteAuto();
+  });
   box.style.display='block';
 }
+
+function renderSuggTo(inp,box,pois){
+  renderSuggGeneric(inp,box,pois,function(item){
+    inp.value=item.name;S.currentTo=item.name;
+    if(item.location)S.destLoc=item.location;
+    box.style.display='none';
+    // ← AUTO ROUTE TRIGGER
+    clearTimeout(window._autoSearchTimer);
+    setTimeout(calcRouteAuto,100);
+  });
+}
+
+function renderSuggGeneric(inp,box,items,onPick){
+  if(!items||!items.length){box.style.display='none';return;}
+  box.innerHTML=items.map(function(item){return'<div class="sugg-i"><div>📍 '+item.name+'</div>'+(item.address?'<div class="sugg-addr">'+item.address.slice(0,30)+(item.address.length>30?'…':'')+'</div>':'')+'</div>';}).join('');
+  box.querySelectorAll('.sugg-i').forEach(function(el,i){
+    function pick(){onPick(items[i]);}
+    el.addEventListener('mousedown',function(e){e.preventDefault();pick();});
+    el.addEventListener('touchstart',function(e){e.preventDefault();pick();},{passive:false});
+  });
+  box.style.display='block';
+}
+// setupLocInp kept as utility for backward compat (favs loading etc)
+function setupLocInp(inpId,suggId){
+  var inp=document.getElementById(inpId),box=document.getElementById(suggId);
+  inp.addEventListener('blur',function(){setTimeout(function(){if(box)box.style.display='none';},240);});
+}
+function showLocalSugg(inp,box,v){var list=v?PLACES.filter(function(p){return p.toLowerCase().indexOf(v.toLowerCase())>=0;}).slice(0,5):PLACES.slice(0,6);if(!list.length){box.style.display='none';return;}box.innerHTML=list.map(function(p){return'<div class="sugg-i"><div>📍 '+p+'</div></div>';}).join('');box.querySelectorAll('.sugg-i').forEach(function(el,i){function pick(){inp.value=list[i];box.style.display='none';}el.addEventListener('mousedown',function(e){e.preventDefault();pick();});el.addEventListener('touchstart',function(e){e.preventDefault();pick();},{passive:false});});box.style.display='block';}
+// renderSugg alias for backward compat
+function renderSugg(inp,box,items){renderSuggGeneric(inp,box,items,function(item){inp.value=item.name;box.style.display='none';});}
 
 // ===== ENGINE =====
 function estMin(km){var c=C(),spd=S.timeType==='peak'?c.vpk:S.timeType==='night'?c.vnm*1.15:c.vnm;return Math.max(3,Math.round(km/spd*60));}
@@ -890,9 +1074,14 @@ function getAIInsight(km,plans){
   var mxR=rides.length>1?rides[rides.length-1].price:0,diff=cheapR?r1(mxR-cheapR.price):0;
   return tempStr+S.city+' '+wName+' '+{normal:'平峰',peak:'高峰',night:'深夜'}[h]+'，各平台价差¥'+diff+'。'+best.name+'效率最高（'+best.eff+'分），'+best.coupon+'。'+(hitch?'顺风车¥'+hitch.price+'固定价亦是稳妥选择。':'');
 }
-function doSearch(){
-  var km=parseFloat(document.getElementById('kmInp').value);
-  if(!km||km<0.5){alert('请输入有效距离（≥ 0.5 km），或点击🗺️智能测距自动填写');return;}
+function doSearch(kmArg){
+  var km=kmArg||parseFloat(document.getElementById('kmInp').value);
+  if(!km||km<0.5){
+    document.getElementById('manualDistRow').style.display='block';
+    document.getElementById('searchBtn').style.display='flex';
+    alert('距离未能自动获取，请手动选择或输入距离');return;
+  }
+  clearTimeout(window._autoSearchTimer);
   S.currentKm=km;S.currentFrom=document.getElementById('fromInp').value;S.currentTo=document.getElementById('toInp').value;
   var btn=document.getElementById('searchBtn');btn.disabled=true;btn.innerHTML='<div class="spin"></div><span>AI 分析中…</span>';
   setTimeout(function(){
@@ -907,7 +1096,8 @@ function doSearch(){
   },950);
 }
 function showResults(){
-  document.getElementById('tripInput').style.display='none';document.getElementById('tripResults').style.display='block';
+  document.getElementById('tripInput').style.display='none';
+  document.getElementById('tripResults').style.display='block';
   var tags=[S.currentFrom?'🟢 '+S.currentFrom:'',S.currentTo?'🔴 '+S.currentTo:'',getWeatherEmoji(S.realWeatherDesc)+' '+(S.realWeatherDesc||{sunny:'晴天',rain:'小雨',storm:'暴雨'}[S.weather]),{normal:'🟢 平峰',peak:'🔴 高峰',night:'🌙 深夜'}[S.timeType],'🛣️ '+S.currentKm+'km',(S.temperature?'🌡️ '+S.temperature+'°C':'')].filter(Boolean);
   document.getElementById('ctxResult').innerHTML=tags.map(function(t){return'<span class="ctx-t">'+t+'</span>';}).join('');
   var rides=S.currentPlans.filter(function(p){return p.type==='ridehail';}).sort(function(a,b){return a.price-b.price;});
@@ -1043,7 +1233,23 @@ function setupSettings(){
 function renderFavs(){
   var favs=JSON.parse(ls('favs')||'[]'),fl=document.getElementById('favList');fl.innerHTML='';
   if(!favs.length){fl.innerHTML='<div style="font-size:.76rem;color:rgba(255,255,255,.28);padding:10px 0">暂无收藏路线。完成一次比价后可保存。</div>';return;}
-  favs.forEach(function(f,i){var d=document.createElement('div');d.className='fav-item';d.style.cursor='pointer';d.innerHTML='<div style="font-size:1rem">⭐</div><div style="flex:1"><div style="font-size:.82rem;font-weight:700;color:#F59E0B">'+f.name+'</div><div style="font-size:.66rem;color:rgba(255,255,255,.35);margin-top:2px">'+(f.from||'—')+' → '+(f.to||'—')+' · '+f.km+'km · '+f.city+'</div></div><button style="background:none;border:none;color:rgba(255,255,255,.3);cursor:pointer;font-size:.8rem" data-idx="'+i+'">🗑</button>';d.querySelector('button').addEventListener('click',function(e){e.stopPropagation();var favs2=JSON.parse(ls('favs')||'[]');favs2.splice(i,1);sv('favs',JSON.stringify(favs2));renderFavs();});d.addEventListener('click',function(){S.currentFrom=f.from||'';S.currentTo=f.to||'';S.currentKm=f.km;document.getElementById('fromInp').value=f.from||'';document.getElementById('toInp').value=f.to||'';document.getElementById('kmInp').value=f.km;switchPage('Trip');alert('✅ 路线已加载，点击搜索按钮开始分析');});fl.appendChild(d);});
+  favs.forEach(function(f,i){var d=document.createElement('div');d.className='fav-item';d.style.cursor='pointer';d.innerHTML='<div style="font-size:1rem">⭐</div><div style="flex:1"><div style="font-size:.82rem;font-weight:700;color:#F59E0B">'+f.name+'</div><div style="font-size:.66rem;color:rgba(255,255,255,.35);margin-top:2px">'+(f.from||'—')+' → '+(f.to||'—')+' · '+f.km+'km · '+f.city+'</div></div><button style="background:none;border:none;color:rgba(255,255,255,.3);cursor:pointer;font-size:.8rem" data-idx="'+i+'">🗑</button>';d.querySelector('button').addEventListener('click',function(e){e.stopPropagation();var favs2=JSON.parse(ls('favs')||'[]');favs2.splice(i,1);sv('favs',JSON.stringify(favs2));renderFavs();});d.addEventListener('click',function(){
+  S.currentFrom=f.from||'';S.currentTo=f.to||'';S.currentKm=f.km;S.routeKm=f.km;S.destLoc='';
+  document.getElementById('fromInp').value=f.from||'';
+  document.getElementById('fromInp').removeAttribute('readonly');
+  document.getElementById('toInp').value=f.to||'';
+  document.getElementById('kmInp').value=f.km;
+  document.getElementById('routeCard').style.display='block';
+  document.getElementById('routeCardIco').textContent='⭐';
+  document.getElementById('routeCardMain').textContent='收藏路线 · 驾车约 '+f.km+'km';
+  document.getElementById('routeCardMain').style.color='#F59E0B';
+  document.getElementById('routeCardSub').textContent=f.from+' → '+f.to;
+  document.getElementById('routeCardSpinner').style.display='none';
+  document.getElementById('searchBtn').style.display='flex';
+  document.getElementById('searchBtn').innerHTML='✦ AI 智能分析出行方案（'+f.km+'km）';
+  document.getElementById('manualDistRow').style.display='none';
+  switchPage('Trip');
+});fl.appendChild(d);});
 }
 
 // ===== DRAWERS =====
@@ -1065,7 +1271,21 @@ function openHistoryDrawer(){
   content+='<button class="drawer-close-btn" style="margin-top:8px" onclick="closeDrawer()">关闭</button>';
   openDrawer(content);
 }
-function loadFavRoute(i){var favs=JSON.parse(ls('favs')||'[]'),f=favs[i];if(!f)return;S.currentFrom=f.from||'';S.currentTo=f.to||'';S.currentKm=f.km;document.getElementById('fromInp').value=f.from||'';document.getElementById('toInp').value=f.to||'';document.getElementById('kmInp').value=f.km;closeDrawer();switchPage('Trip');}
+function loadFavRoute(i){
+  var favs=JSON.parse(ls('favs')||'[]'),f=favs[i];if(!f)return;
+  S.currentFrom=f.from||'';S.currentTo=f.to||'';S.currentKm=f.km;S.routeKm=f.km;S.destLoc='';
+  document.getElementById('fromInp').value=f.from||'';document.getElementById('fromInp').removeAttribute('readonly');
+  document.getElementById('toInp').value=f.to||'';document.getElementById('kmInp').value=f.km;
+  document.getElementById('routeCard').style.display='block';
+  document.getElementById('routeCardIco').textContent='⭐';
+  document.getElementById('routeCardMain').textContent='收藏路线 · 驾车约 '+f.km+'km';
+  document.getElementById('routeCardMain').style.color='#F59E0B';
+  document.getElementById('routeCardSub').textContent=(f.from||'')+'→'+(f.to||'');
+  document.getElementById('routeCardSpinner').style.display='none';
+  document.getElementById('searchBtn').style.display='flex';
+  document.getElementById('searchBtn').innerHTML='✦ AI 智能分析出行方案（'+f.km+'km）';
+  closeDrawer();switchPage('Trip');
+}
 function openDriverDrawer(){
   openDrawer('<div class="sec">司机净利精算</div><div style="display:flex;flex-direction:column;gap:9px"><input type="number" class="inp" id="drAmt" placeholder="订单金额 ¥" min="1" step="0.1"><input type="number" class="inp" id="drKm" placeholder="里程 km" min="0.5" step="0.5"><input type="number" class="inp" id="drMin" placeholder="时长 分钟" min="1"><div style="font-size:.62rem;color:rgba(255,255,255,.3);margin-top:2px">平台抽成</div><div style="display:flex;gap:6px;flex-wrap:wrap"><button class="chip on" onclick="setDC(0.23,this)">滴滴 23%</button><button class="chip" onclick="setDC(0.20,this)">高德 20%</button><button class="chip" onclick="setDC(0.18,this)">哈啰 18%</button><button class="chip" onclick="setDC(0.15,this)">嘀嗒 15%</button></div><div style="font-size:.62rem;color:rgba(255,255,255,.3);margin-top:2px">能源类型</div><div style="display:flex;gap:6px;flex-wrap:wrap"><button class="chip" onclick="setDE(0.38,this)">⚡ 纯电 ¥0.38/km</button><button class="chip on" onclick="setDE(0.65,this)">⛽ 燃油 ¥0.65/km</button><button class="chip" onclick="setDE(0.48,this)">🔋 混动 ¥0.48/km</button></div><button class="btn-primary" onclick="calcDriver()">🧮 开始精算</button><div id="drResult" style="display:none"></div></div><button class="drawer-close-btn" style="margin-top:10px" onclick="closeDrawer()">关闭</button>');
 }
@@ -1091,7 +1311,7 @@ function startAutoRefresh(){
   setInterval(function(){var a=S.adcode||CITY_ADCODE[S.city]||'310000';detectTimeContext();fetchRealWeather(a);},15*60*1000);
   setInterval(function(){detectTimeContext();renderHome();},5*60*1000);
 }
-window.closeDrawer=closeDrawer;window.loadFavRoute=loadFavRoute;
+window.closeDrawer=closeDrawer;window.loadFavRoute=loadFavRoute;window.retryGPS=retryGPS;
 window.setDC=setDC;window.setDE=setDE;window.calcDriver=calcDriver;
 </script>
 </body>
